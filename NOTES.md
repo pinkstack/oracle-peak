@@ -1,0 +1,3 @@
+## Notes
+
+> This document contains random blubs and peaces,...

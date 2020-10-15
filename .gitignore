@@ -1,0 +1,7 @@
+venv/
+.direnv/
+target/
+.idea/
+project/target
+*.class
+*.log
