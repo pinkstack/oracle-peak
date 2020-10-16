@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Turn Power LED off
+      shell: |
+        sh -c 'echo 0 > /sys/class/leds/led1/brightness'
+        sh -c 'echo none > /sys/class/leds/led1/trigger'
+
+    - name: Turn Activity LED off
+      shell: sh -c 'echo 0 > /sys/class/leds/led0/brightness'
+
+    - name: Turn Ethernet LED off
+      shell: |
+        sh -c 'echo 0 > /sys/class/leds/led1/brightness'
+        sh -c 'echo none > /sys/class/leds/led1/trigger'

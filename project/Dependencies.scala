@@ -8,12 +8,11 @@ object Dependencies {
   private lazy val Cats: Version = "2.0.0"
 
   lazy val akka: Seq[ModuleID] = Seq(
-    "com.typesafe.akka" %% "akka-actor" % Akka,
-    "com.typesafe.akka" %% "akka-actor-typed" % Akka,
-    "com.typesafe.akka" %% "akka-stream" % Akka,
+    "com.typesafe.akka" %% "akka-actor",
+    "com.typesafe.akka" %% "akka-actor-typed",
+    "com.typesafe.akka" %% "akka-stream"
+  ).map(_ % Akka) ++ Seq(
     "com.typesafe.akka" %% "akka-http" % AkkaHttp,
-
-    // Circe + Akka HTTP
     "de.heikoseeberger" %% "akka-http-circe" % "1.34.0"
   )
 
@@ -30,7 +29,8 @@ object Dependencies {
   ).map(_ % Circe)
 
   lazy val configurationLibs: Seq[ModuleID] = Seq(
-    "com.typesafe" % "config" % "1.4.0"
+    "com.typesafe" % "config" % "1.4.0",
+    "com.github.pureconfig" %% "pureconfig" % "0.14.0"
   )
 
   lazy val logging: Seq[ModuleID] = Seq(
@@ -39,8 +39,11 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-slf4j" % "2.6.8"
   )
 
-
   lazy val testing: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % "3.2.2"
+  )
+
+  lazy val neo4j: Seq[ModuleID] = Seq(
+    "org.neo4j.driver" % "neo4j-java-driver" % "4.1.1"
   )
 }

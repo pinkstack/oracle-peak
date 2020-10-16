@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  gather_facts: True
+  gather_subset: interfaces
+
+  tasks:
+    - name: "Start airmon-ng"
+      shell: |
+        (sudo airmon-ng start wlan1 || true)

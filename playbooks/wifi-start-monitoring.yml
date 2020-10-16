@@ -1,0 +1,41 @@
+# Resources
+# - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+# - https://ansibledaily.com/execute-detached-process-with-ansible/
+# - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+
+---
+- hosts: all
+  become: true
+  gather_facts: no
+  gather_subset: interfaces
+
+  tasks:
+    - name: Creates oracle-peak directory
+      file:
+        path: /root/oracle-peak
+        state: directory
+        mode: 0775
+
+    - name: Copy monitor.sh script
+      copy:
+        src: ./../sbin/monitor.sh
+        dest: /root/oracle-peak/monitor.sh
+        mode: 777
+        force: yes
+
+      #- name: "Start monitor.sh script"
+      #  args:
+      #    chdir: /root/oracle-peak/
+      # creates: test.txt
+      #poll: 2
+      #async: 1000
+      #command: |
+      #  (top &)
+      #shell: |
+      #  top
+
+      #shell: |
+      #  nohup top </dev/null >/dev/null 2>&1 &
+      #raw: |
+      #  cd /root/oracle-peak/; nohup python -mSimpleHTTPServer </dev/null >/dev/null 2>&1 & sleep 1
+      # register: top

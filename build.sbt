@@ -19,5 +19,6 @@ lazy val root = (project in file("."))
         Dependencies.circe ++
         Dependencies.configurationLibs ++
         Dependencies.logging ++
+        Dependencies.neo4j ++
         Dependencies.testing
   )
