@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  neo4j:
+    # Read: https://neo4j.com/docs/operations-manual/current/docker/
+    image: library/neo4j:4.1
+    ports:
+      - "7474:7474"
+      - "6477:6477"
+      - "7687:7687"
+    volumes:
+      - $PWD/data/neo4j/data:/data
+      - $PWD/data/neo4j/logs:/logs
+      - $PWD/data/neo4j/import:/var/lib/neo4j/import
+      - $PWD/data/neo4j/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=neo4j/n6pXFh
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
+      # - NEO4J_dbms_security_procedures_unrestricted="algo.\\\*,apoc.\\\*"
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+volumes:
+  logvolume01: { }

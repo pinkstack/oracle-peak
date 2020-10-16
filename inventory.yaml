@@ -1,0 +1,7 @@
+all:
+  hosts:
+    oreacle-man:
+      # ansible_host: 192.168.64.117
+      ansible_host: oracle-man-krk
+      ansible_user: pi
+      become: yes

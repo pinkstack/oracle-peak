@@ -1,0 +1,6 @@
+### Exploring session
+GET http://user:dodo@192.168.1.7:8081/api/session?from=
+Accept: application/json, text/plain, */*
+
+###
+GET ws://user:dodo@192.168.1.7:8081/api/events
