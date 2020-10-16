@@ -5,4 +5,4 @@ target/
 project/target
 *.class
 *.log
-/data/
+data/

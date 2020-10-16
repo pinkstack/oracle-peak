@@ -44,6 +44,7 @@ object Dependencies {
   )
 
   lazy val neo4j: Seq[ModuleID] = Seq(
-    "org.neo4j.driver" % "neo4j-java-driver" % "4.1.1"
+    "org.neo4j.driver" % "neo4j-java-driver" % "4.2.0-alpha01" // "4.1.1"
+
   )
 }

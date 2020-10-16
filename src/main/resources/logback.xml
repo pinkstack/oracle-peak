@@ -20,8 +20,9 @@
     </appender>
     -->
 
-    <logger name="com.pinkstack" level="DEBUG"/>
     <logger name="akka" level="DEBUG"/>
+    <logger name="com.pinkstack" level="DEBUG"/>
+    <logger name="org.neo4j" level="WARN"/>
 
 
     <root level="info">
