@@ -31,10 +31,18 @@ object BetterCapClient {
     } yield json
   }
 
-  def getSession(implicit system: ActorSystem, config: Configuration.Config): Future[Option[Vector[Json]]] = {
+  private[this] def define(request: HttpRequest)
+                          (transform: Json => Json)
+                          (implicit system: ActorSystem, config: Configuration.Config): Future[Option[Vector[Json]]] = {
     import system.dispatcher
-    val json: Future[Json] = requestParse(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "session")))
-    val transform: Json => Json = _.hcursor.downField("wifi").downField("aps").focus.get
-    json.map(transform).map(_.asArray)
+    requestParse(request).map(transform).map(_.asArray)
   }
+
+  def session(implicit system: ActorSystem, config: Configuration.Config): Future[Option[Vector[Json]]] =
+    define(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "session"))) { json =>
+      json.hcursor.downField("wifi").downField("aps").focus.get
+    }
+
+  def events(implicit system: ActorSystem, config: Configuration.Config): Future[Option[Vector[Json]]] =
+    define(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "events").withQuery(Uri.Query(("n", "100")))))(_.hcursor.value)
 }

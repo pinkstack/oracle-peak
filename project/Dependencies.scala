@@ -6,6 +6,7 @@ object Dependencies {
   private lazy val AkkaHttp: Version = "10.2.1"
   private lazy val Circe: Version = "0.13.0"
   private lazy val Cats: Version = "2.0.0"
+  private lazy val Shapeless: Version = "2.3.3"
 
   lazy val akka: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor",
@@ -17,7 +18,8 @@ object Dependencies {
   )
 
   lazy val fp: Seq[ModuleID] = Seq(
-    "org.typelevel" %% "cats-core" % Cats
+    "org.typelevel" %% "cats-core" % Cats,
+    "com.chuusai" %% "shapeless" % Shapeless
   )
 
   lazy val circe: Seq[ModuleID] = Seq(
@@ -25,7 +27,8 @@ object Dependencies {
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-generic-extras",
     "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-optics"
+    "io.circe" %% "circe-optics",
+    "io.circe" %% "circe-shapes"
   ).map(_ % Circe)
 
   lazy val configurationLibs: Seq[ModuleID] = Seq(
