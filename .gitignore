@@ -6,3 +6,7 @@ project/target
 *.class
 *.log
 data/
+data-krk/
+
+
+requests/http-client.env.json

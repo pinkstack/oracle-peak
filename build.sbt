@@ -15,6 +15,7 @@ lazy val root = (project in file("."))
     name := "Oracle Peak",
     libraryDependencies ++=
       Dependencies.akka ++
+        Dependencies.alpakka ++
         Dependencies.fp ++
         Dependencies.circe ++
         Dependencies.configurationLibs ++
