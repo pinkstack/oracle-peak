@@ -23,21 +23,6 @@ The current setup (although not yet finalised) for collection part of this proje
 - [Alfa Network AWUS036NH USB 2.0 Highpower WLAN Adapter and 5dBi antenna](https://wlan-profi-shop.de/Alfa-Network-AWUS036NH/GE-RT3070-USB-20-Highpower-WLAN-Adapter-2000mW-2W-and-5dBi-antenna)
 - [Lumsing 60W 6 Ports Desktop USB Charger](https://www.amazon.co.uk/Lumsing-Desktop-Charger-Intelligent-Motorola-blue/dp/B01N2LCNED)
 
-### Management
-
-To manage and operate the collection nodes please use the following Ansible based scripts and tools.
-
-```bash
-mkvirtualenv --python=/usr/local/Cellar/python@3.8/3.8.5/bin/python3 oracle-peak
-pip install -r requirements.txt --upgrade pip
-```
-
-#### Playbooks
-
-- [wifi-enable-monitoring.yml](playbooks/wifi-enable-monitoring.yml) - Put WiFi card into "monitoring mode".
-- [turn-leds-off.yml](playbooks/turn-leds-off.yml) - Turn all RPi LED's OFF
-- [turn-leds-on.yml](playbooks/turn-leds-on.yml) - Turn all RPi LED's ON
-
 
 ## Authors
 
