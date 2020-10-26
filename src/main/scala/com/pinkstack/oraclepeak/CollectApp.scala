@@ -15,42 +15,18 @@ import com.typesafe.scalalogging.LazyLogging
 import akka.stream.scaladsl._
 import com.pinkstack.oraclepeak.Model.Events.Event
 import com.pinkstack.oraclepeak.Model._
+import com.pinkstack.oraclepeak.bettercap.{Flows, WebClient}
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import org.neo4j.driver._
+
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.jdk.FutureConverters._
 import scala.jdk.CollectionConverters._
 
-object BettercapCollectionFlow {
 
-  import io.circe._, io.circe.parser._, io.circe.generic.auto._
-  import Model._
-
-  private[this] def define[T](f: Future[Option[Vector[Json]]], parallelism: Int = 2)
-                             (transformation: Json => Either[Exception, T])
-                             (implicit system: ActorSystem, config: Configuration.Config): Flow[Tick, T, NotUsed] =
-    Flow[Tick]
-      .mapAsyncUnordered(parallelism)(_ => f)
-      .collect {
-        case Some(jsons) => Source(jsons)
-        case None => throw new Exception("Problem fetching data from Bettercap server")
-      }
-      .flatMapConcat(identity)
-      .map(transformation)
-      .collect {
-        case Right(value) => value
-        case Left(exception) => throw exception
-      }
-
-  def accessPoints()(implicit system: ActorSystem, config: Configuration.Config): Flow[Tick, AccessPoint, NotUsed] =
-    define(BetterCapClient.session, 2)(_.as[AccessPoint])
-
-  def events()(implicit system: ActorSystem, config: Configuration.Config): Flow[Tick, Event, NotUsed] =
-    define(BetterCapClient.events, 2)(_.as[Event])
-}
 
 object Neo4jSink extends LazyLogging {
 
@@ -149,7 +125,7 @@ object CollectApp extends App with LazyLogging {
 
 
   Source.tick(0.seconds, 2.seconds, Tick)
-    .via(BettercapCollectionFlow.accessPoints())
+    .via(Flows.accessPoints())
     .runWith(Sink.foreach(println))
 
   val f = Source.tick(0.seconds, 2.seconds, Tick)
@@ -158,7 +134,7 @@ object CollectApp extends App with LazyLogging {
       onElement = Attributes.LogLevels.Debug,
       onFinish = Attributes.LogLevels.Debug,
       onFailure = Attributes.LogLevels.Error))
-    .via(BettercapCollectionFlow.events())
+    .via(Flows.events())
     .runWith(Sink.foreach(println))
 
   f.onComplete {

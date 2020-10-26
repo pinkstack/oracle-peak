@@ -61,6 +61,14 @@ object Model {
                                 clients: List[Client] = List.empty[Client]
                               ) extends Device
 
+  final case class Session(version: String, os: String, arch: String, wifi: Session.Wifi)
+
+  object Session {
+
+    case class Wifi(aps: List[AccessPoint])
+
+  }
+
   object Events {
 
     import io.circe.Decoder, io.circe.generic.auto._

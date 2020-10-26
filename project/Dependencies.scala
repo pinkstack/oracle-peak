@@ -17,6 +17,10 @@ object Dependencies {
     "de.heikoseeberger" %% "akka-http-circe" % "1.34.0"
   )
 
+  lazy val alpakka: Seq[ModuleID] = Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "2.0.2"
+  )
+
   lazy val fp: Seq[ModuleID] = Seq(
     "org.typelevel" %% "cats-core" % Cats,
     "com.chuusai" %% "shapeless" % Shapeless
