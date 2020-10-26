@@ -10,7 +10,7 @@ object Configuration {
 
   final case class Neo4j(url: java.net.URI, user: String, password: String)
 
-  final case class Mqtt(broker: String, clientId: String)
+  final case class Mqtt(broker: String, clientId: String, root: String)
 
   final case class Config(bettercap: Bettercap, neo4j: Neo4j, mqtt: Mqtt)
 

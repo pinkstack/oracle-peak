@@ -23,7 +23,6 @@ object Dependencies {
 
   lazy val fp: Seq[ModuleID] = Seq(
     "org.typelevel" %% "cats-core" % Cats,
-    "com.chuusai" %% "shapeless" % Shapeless
   )
 
   lazy val circe: Seq[ModuleID] = Seq(
@@ -52,6 +51,5 @@ object Dependencies {
 
   lazy val neo4j: Seq[ModuleID] = Seq(
     "org.neo4j.driver" % "neo4j-java-driver" % "4.2.0-alpha01" // "4.1.1"
-
   )
 }

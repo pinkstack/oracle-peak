@@ -1,59 +1,50 @@
-package com.pinkstack.oraclepeak
+package com.pinkstack.oraclepeak.agent
 
-import java.time.{LocalDateTime, ZoneId, ZoneOffset}
+import java.time.{LocalDateTime, ZoneOffset}
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.alpakka.mqtt.{MqttConnectionSettings, MqttMessage, MqttQoS}
-import akka.stream.scaladsl._
 import akka.stream.alpakka.mqtt.scaladsl._
-import akka.util.ByteString
+import akka.stream.alpakka.mqtt._
+import akka.stream.scaladsl._
+import com.pinkstack.oraclepeak.Configuration
 import com.pinkstack.oraclepeak.Model._
+import com.pinkstack.oraclepeak.bettercap
 import com.typesafe.scalalogging.LazyLogging
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-object MqttSettings {
-  def apply(): MqttConnectionSettings = {
-    val mqtt: Configuration.Mqtt = Configuration.load.mqtt
-    MqttConnectionSettings(mqtt.broker, mqtt.clientId, new MemoryPersistence)
-  }
-}
-
-case class MMessage(topic: String, payload: ByteString) {
-  def asMqttMessage: MqttMessage = MqttMessage(topic = topic, payload = payload)
-
-  override def toString: String = s"$topic: ${payload.decodeString("UTF-8")}"
-}
-
-object MMessage {
-  type Path = String
-
-  implicit class PathImprovements(val path: Path) {
-    def /(other: String): Path = path + "/" + other
-  }
-
-  def apply(path: Path)(content: String)(implicit root: Path): MMessage =
-    MMessage.apply(topic = root / path, payload = ByteString(content))
-}
-
-object AgentApp extends App with LazyLogging {
+object Agent extends App with LazyLogging {
   implicit val config: Configuration.Config = Configuration.load
-  implicit val system: ActorSystem = ActorSystem("collect")
+  implicit val system: ActorSystem = ActorSystem("agent")
 
-  import system.dispatcher
   import MMessage._
-  import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+  import io.circe.generic.auto._
+  import io.circe.syntax._
+  import system.dispatcher
 
-  implicit val root: MMessage.Path = "oracle-peak-development" / "experiment-1"
+  implicit val root: MMessage.Path = config.mqtt.root
+
+  println {
+    s""" 🏔 Oracle Peak Agent 🏔
+       | Java Version: ${System.getProperty("java.version")}
+       | Java VM Version: ${System.getProperty("java.vm.version")}
+       | Java VM Name: ${System.getProperty("java.vm.name")}
+       | Java Runtime Version: ${System.getProperty("java.runtime.version")}
+       | Java Runtime Name: ${System.getProperty("java.runtime.name")}
+       | OS ARCH: ${System.getProperty("os.arch")}
+       | ---
+       | Name: ${BuildInfo.name}
+       | SBT Version: ${BuildInfo.sbtVersion}
+       | Scala Version: ${BuildInfo.scalaVersion}
+       | Version: ${BuildInfo.version}
+       |""".stripMargin
+  }
 
   lazy val mqttSink: Sink[MqttMessage, Future[Done]] = {
-    logger.info(s"Booting MQTT Sink,...")
-    // AtMostOnce => 0 => Fast no ACK
-    // AtLeastOnce => 1 => Basic ACK flow
+    logger.info(s"Booting MQTT Sink with broker: ${config.mqtt.broker} with root ${root}")
     MqttSink(MqttSettings().withCleanSession(true), MqttQoS.AtLeastOnce)
   }
 
@@ -61,14 +52,15 @@ object AgentApp extends App with LazyLogging {
     .via(bettercap.Flows.sessions())
     .map { session: Session =>
       List[MMessage](
-        MMessage("session")(session.asJson.toString()),
+        MMessage("agent-version")(BuildInfo.version),
+        MMessage("session")(content = session.asJson.toString),
         MMessage("wifi-aps-size")(session.wifi.aps.size.toString),
         MMessage("wifi-aps-client-size")(session.wifi.aps.map(ap => ap.clients.size).sum.toString)
       ) ++
         session.wifi.aps.flatMap { ap: AccessPoint =>
           val apPath = "access-points" / ap.mac
           List[MMessage](
-            MMessage(apPath / "hostname")(ap.hostname.getOrElse("unknown")),
+            // MMessage(apPath / "hostname")(ap.hostname.getOrElse("unknown")),
             MMessage(apPath / "rssi")(ap.rssi.toString),
             MMessage(apPath / "clients-size")(ap.clients.size.toString),
             MMessage(apPath / "last-seen")(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString)
@@ -76,7 +68,7 @@ object AgentApp extends App with LazyLogging {
             ap.clients.flatMap { client =>
               val cPath = apPath / "client" / client.mac
               List[MMessage](
-                MMessage(cPath / "hostname")(client.hostname.getOrElse("unknown")),
+                // MMessage(cPath / "hostname")(client.hostname.getOrElse("unknown")),
                 MMessage(cPath / "rssi")(client.rssi.toString),
                 MMessage(cPath / "last-seen")(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString)
               )
@@ -89,7 +81,7 @@ object AgentApp extends App with LazyLogging {
     .map(_.asMqttMessage).runWith(mqttSink)
 
   f.onComplete {
-    case Success(value) =>
+    case Success(value) => value
     case Failure(exception) =>
       System.err.println(exception)
       system.terminate()
