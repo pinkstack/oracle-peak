@@ -1,0 +1,6 @@
+.direnv/
+target/
+project/target
+data/
+data-krk/
+venv/

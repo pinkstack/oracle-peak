@@ -5,8 +5,9 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import com.pinkstack.oraclepeak.Model.Events.Event
 import com.pinkstack.oraclepeak._
+import com.typesafe.scalalogging.LazyLogging
 
-object Flows {
+object Flows extends LazyLogging {
 
   import Model._
   import io.circe._
@@ -14,6 +15,9 @@ object Flows {
 
   def sessions()(implicit system: ActorSystem, configuration: Configuration.Config): Flow[Tick, Session, NotUsed] = {
     import system.dispatcher
+
+    logger.info(s"Bettercap URL: ${configuration.bettercap.url}")
+
     Flow[Tick].mapAsyncUnordered(parallelism = 2)(_ =>
       WebClient.session.map(_.as[Session].toOption)
     ).collect {
