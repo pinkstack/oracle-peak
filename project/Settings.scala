@@ -37,6 +37,11 @@ object Settings {
       Resolver.bintrayRepo("ovotech", "maven"),
       "Confluent Maven Repository" at "https://packages.confluent.io/maven/",
       "jitpack" at "https://jitpack.io"
-    )
+    ),
+
+    publishArtifact := false,
+    publishConfiguration := publishConfiguration.value.withOverwrite(true),
+    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+    // skip in publish
   )
 }
