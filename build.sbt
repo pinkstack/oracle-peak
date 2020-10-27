@@ -11,7 +11,6 @@ lazy val core = (project in file("oracle-peak/core"))
       Dependencies.circe ++
       Dependencies.configurationLibs ++
       Dependencies.logging ++
-      Dependencies.neo4j ++
       Dependencies.testing)
   .enablePlugins(BuildInfoPlugin)
   .settings(
@@ -54,3 +53,6 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .settings(sharedSettings: _*)
   .settings(name := "processor")
   .dependsOn(core)
+  .settings(libraryDependencies ++=
+    Dependencies.neo4j
+  )
