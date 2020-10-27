@@ -1,31 +1,19 @@
-package com.pinkstack.oraclepeak
+package com.pinkstack.oraclepeak.processor
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-import cats._
-import cats.implicits._
-import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream._
-import com.typesafe.scalalogging.LazyLogging
 import akka.stream.scaladsl._
-import com.pinkstack.oraclepeak.Model.Events.Event
+import akka.{Done, NotUsed}
+import com.pinkstack.oraclepeak.Configuration
 import com.pinkstack.oraclepeak.Model._
-import com.pinkstack.oraclepeak.bettercap.{Flows, WebClient}
-import io.circe.Json
-import io.circe.optics.JsonPath.root
+import com.pinkstack.oraclepeak.bettercap.Flows
+import com.typesafe.scalalogging.LazyLogging
 import org.neo4j.driver._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.concurrent.{Await, Future}
 import scala.jdk.FutureConverters._
-import scala.jdk.CollectionConverters._
-
+import scala.util.{Failure, Success}
 
 
 object Neo4jSink extends LazyLogging {
@@ -48,7 +36,7 @@ object Neo4jSink extends LazyLogging {
       case (k, v: Any) => s"""$k: '$v'"""
     }.mkString(", ").strip()
 
-  def deviceToNode(device: Model.Device, id: String, kind: String*): Node = Node(id, device, kind: _*)
+  def deviceToNode(device: Device, id: String, kind: String*): Node = Node(id, device, kind: _*)
 
   private[this] def neo4jSink()(implicit system: ActorSystem, config: Configuration.Config): Sink[Element, Future[Done]] = {
     import system.dispatcher
@@ -101,8 +89,6 @@ object Neo4jSink extends LazyLogging {
 }
 
 object CollectApp extends App with LazyLogging {
-
-  import Model._
 
   implicit val system: ActorSystem = ActorSystem("collect")
 
