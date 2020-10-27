@@ -21,4 +21,4 @@ jobs:
 
       - name: Compile, build and publish Docker Image
         run: |
-          sbt compile docker:publishLocal
+          sbt "clean; compile; docker:publishLocal"
