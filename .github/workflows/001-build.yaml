@@ -36,8 +36,9 @@ jobs:
       #  run: |
       #    docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
 
-      - uses: olafurpg/setup-scala@v5
-      #  with: openjdk@1.14
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: openjdk@1.11
 
       - name: Compile, build and publish Docker Image
         run: |
