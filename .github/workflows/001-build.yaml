@@ -1,6 +1,10 @@
 name: CI
 
-on: [ release ]
+on:
+  push:
+    tags:
+      - v0.*
+      - v1.*
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
