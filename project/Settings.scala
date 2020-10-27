@@ -4,7 +4,7 @@ import sbt.nio.Keys._
 
 object Settings {
   lazy val sharedSettings = Seq(
-    version := "0.0.1",
+    // version := "0.0.1",
 
     scalaVersion := "2.13.3",
     organizationName := "Pinkstack",
@@ -45,7 +45,6 @@ object Settings {
     publishMavenStyle := false,
     publishArtifact := false,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
-    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
-    // skip in publish
+    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )
 }

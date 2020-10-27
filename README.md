@@ -24,6 +24,31 @@ The current setup (although not yet finalised) for collection part of this proje
 - [Lumsing 60W 6 Ports Desktop USB Charger](https://www.amazon.co.uk/Lumsing-Desktop-Charger-Intelligent-Motorola-blue/dp/B01N2LCNED)
 
 
+### Software - Agent
+
+Environment variables
+
+- `MQTT_BROKER=tcp://mqtt.eclipse.org`
+- `MQTT_CLIENT_ID=oracle-peak-development-client-XXX`
+- `MQTT_ROOT_TOPIC=oracle-peak-development/experiment-2`
+- `MQTT_EMIT=true`
+- `BETTERCAP_URL=http://192.168.33.33:3333`
+- `BETTERCAP_USER=user`
+- `BETTERCAP_PASSWORD=pass`
+
+## Development
+
+### Agent - Local development
+
+```bash
+$ sbt "project agent; run"
+```
+### Releases
+
+```sbt
+release release-version 0.0.2 next-version 0.0.3
+```
+
 ## Authors
 
 - [Oto Brglez](https://github.com/otobrglez)
