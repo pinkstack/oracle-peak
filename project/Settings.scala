@@ -39,9 +39,13 @@ object Settings {
       "jitpack" at "https://jitpack.io"
     ),
 
+    publish := {},
+    publishLocal := {},
+    publishArtifact := false,
+    publishMavenStyle := false,
     publishArtifact := false,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
-    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
     // skip in publish
   )
 }
