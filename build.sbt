@@ -59,3 +59,4 @@ lazy val processor = (project in file("oracle-peak/processor"))
 
 // publishTo in ThisBuild := false
 publishArtifact := false
+skip in publish := true
