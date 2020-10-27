@@ -56,3 +56,6 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .settings(libraryDependencies ++=
     Dependencies.neo4j
   )
+
+// publishTo in ThisBuild := false
+publishArtifact := false
