@@ -38,17 +38,6 @@ lazy val agent = (project in file("oracle-peak/agent"))
     dockerAliases ++= Seq()
   )
 
-// lazy val agentForARM = {
-//   import com.typesafe.sbt.packager.docker._
-//   agent.settings(
-//     dockerCommands := Seq(
-//       Cmd("FROM", "openjdk:8"),
-//       Cmd("LABEL", s"""MAINTAINER="${maintainer.value}""""),
-//       ExecCmd("CMD", "echo", "Hello, World from Docker")
-//     )
-//   )
-// }
-
 lazy val processor = (project in file("oracle-peak/processor"))
   .settings(sharedSettings: _*)
   .settings(name := "processor")
