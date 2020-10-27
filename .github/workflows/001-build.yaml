@@ -34,8 +34,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Login to Github Container Registry
         run: |
-          docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io && \
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+          docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
 
       - uses: olafurpg/setup-scala@v5
       #  with: openjdk@1.14
