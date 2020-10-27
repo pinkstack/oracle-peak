@@ -1,4 +1,4 @@
-package com.pinkstack.oraclepeak
+package com.pinkstack.oraclepeak.core
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

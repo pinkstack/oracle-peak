@@ -4,7 +4,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
-import com.pinkstack.oraclepeak.Model.{AccessPoint, Session}
+import com.pinkstack.oraclepeak.core.Model.{AccessPoint, Session}
 
 object SessionToMessage {
 

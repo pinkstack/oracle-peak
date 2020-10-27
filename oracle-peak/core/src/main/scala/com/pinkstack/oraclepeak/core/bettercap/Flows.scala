@@ -1,19 +1,21 @@
-package com.pinkstack.oraclepeak.bettercap
+package com.pinkstack.oraclepeak.core.bettercap
 
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import com.pinkstack.oraclepeak.Model.Events.Event
-import com.pinkstack.oraclepeak._
+import com.pinkstack.oraclepeak.core.Model._
+import com.pinkstack.oraclepeak.core.Model.Events._
+import com.pinkstack.oraclepeak.core.Configuration
+import com.pinkstack.oraclepeak.core.Configuration.Config
 import com.typesafe.scalalogging.LazyLogging
 
 object Flows extends LazyLogging {
 
-  import Model._
+  import com.pinkstack.oraclepeak.core.Model._
   import io.circe._
   import io.circe.generic.auto._
 
-  def sessions()(implicit system: ActorSystem, configuration: Configuration.Config): Flow[Tick, Session, NotUsed] = {
+  def sessions()(implicit system: ActorSystem, configuration: Config): Flow[Tick, Session, NotUsed] = {
     import system.dispatcher
 
     logger.info(s"Bettercap URL: ${configuration.bettercap.url}")

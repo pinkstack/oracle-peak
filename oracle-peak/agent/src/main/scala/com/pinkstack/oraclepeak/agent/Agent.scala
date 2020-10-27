@@ -6,8 +6,8 @@ import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt._
 import akka.stream.alpakka.mqtt.scaladsl._
 import akka.stream.scaladsl._
-import com.pinkstack.oraclepeak.Model._
-import com.pinkstack.oraclepeak.{Configuration, bettercap}
+import com.pinkstack.oraclepeak.core.Model._
+import com.pinkstack.oraclepeak.core.{Configuration, bettercap}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future

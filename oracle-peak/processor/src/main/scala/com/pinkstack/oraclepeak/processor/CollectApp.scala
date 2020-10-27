@@ -4,9 +4,9 @@ import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.{Done, NotUsed}
-import com.pinkstack.oraclepeak.Configuration
-import com.pinkstack.oraclepeak.Model._
-import com.pinkstack.oraclepeak.bettercap.Flows
+import com.pinkstack.oraclepeak.core.Model._
+import com.pinkstack.oraclepeak.core.Configuration
+import com.pinkstack.oraclepeak.core.bettercap.Flows
 import com.typesafe.scalalogging.LazyLogging
 import org.neo4j.driver._
 

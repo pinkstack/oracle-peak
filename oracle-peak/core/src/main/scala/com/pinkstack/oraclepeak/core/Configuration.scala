@@ -1,4 +1,4 @@
-package com.pinkstack.oraclepeak
+package com.pinkstack.oraclepeak.core
 
 import pureconfig._
 import pureconfig.generic.auto._

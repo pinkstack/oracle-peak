@@ -1,11 +1,11 @@
-package com.pinkstack.oraclepeak.bettercap
+package com.pinkstack.oraclepeak.core.bettercap
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, Uri, headers}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import com.pinkstack.oraclepeak.Configuration
-import com.pinkstack.oraclepeak.Model.Session
+import com.pinkstack.oraclepeak.core.Configuration
+import com.pinkstack.oraclepeak.core.Model.Session
 
 import scala.concurrent.Future
 
