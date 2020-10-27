@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Login to Github Container Registry
-        run: |
-          docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
+      #- name: Login to Github Container Registry
+      #  run: |
+      #    docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
 
       - uses: olafurpg/setup-scala@v5
       #  with: openjdk@1.14
