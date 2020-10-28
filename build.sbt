@@ -81,7 +81,12 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .dependsOn(core)
   .settings(libraryDependencies ++=
     Dependencies.neo4j
-  )
+  ).settings(
+  publish := {},
+  publishLocal := {},
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+)
 
 // publishTo in ThisBuild := false
 // publishArtifact := false
