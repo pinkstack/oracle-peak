@@ -31,6 +31,7 @@ and feed to MQTT topic of your chose.
 
 ```bash
 docker run -d --name=agent \ 
+    -e MQTT_CLIENT_ID=device-one \
     -e MQTT_ROOT_TOPIC=oracle-peak-staging/location-one \
     -e BETTERCAP_URL=http://127.0.0.1:8081 \
     --network=host --restart=always \
