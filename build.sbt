@@ -62,6 +62,12 @@ lazy val agent = (project in file("oracle-peak/agent"))
     )
   ).dependsOn(core)
   .aggregate(core)
+  .settings(
+    publish := {},
+    publishLocal := {},
+    publishArtifact := false,
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+  )
 
 
 lazy val processor = (project in file("oracle-peak/processor"))
