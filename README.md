@@ -15,18 +15,44 @@ manufacturer information and time related activity.
 
 ## Collection
 
-### Hardware
+### Software - Oracle Peak Agent
 
-The current setup (although not yet finalised) for collection part of this project consists of
+One of the key components of this system is [oracle-peak-agent](oracle-peak/agent), an agent that needs to be deployed
+either on the device where collection is happening (Respeberry Pi in following example) or on some external 
+service with the access to bettercap (REST API).
 
-- [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
-- [Alfa Network AWUS036NH USB 2.0 Highpower WLAN Adapter and 5dBi antenna](https://wlan-profi-shop.de/Alfa-Network-AWUS036NH/GE-RT3070-USB-20-Highpower-WLAN-Adapter-2000mW-2W-and-5dBi-antenna)
-- [Lumsing 60W 6 Ports Desktop USB Charger](https://www.amazon.co.uk/Lumsing-Desktop-Charger-Intelligent-Motorola-blue/dp/B01N2LCNED)
+#### Setup
 
+1. Install Bettercap by following [this instructions](https://www.bettercap.org/installation/).
+2. Install Docker by following [this instructions (for RPi v3)](https://phoenixnap.com/kb/docker-on-raspberry-pi).
+3. Run the following command on RPi (v3) that will boot the agent. 
+The agent will then read data from bettercap's REST API endpoints transform it 
+and feed to MQTT topic of your chose. 
 
-### Software - Agent
+```bash
+docker run -d --name=agent \ 
+    -e MQTT_ROOT_TOPIC=oracle-peak-staging/location-one \
+    -e BETTERCAP_URL=http://127.0.0.1:8081 \
+    --network=host --restart=always \
+    ghcr.io/pinkstack/oracle-peak-agent-arm32v7:0.0.8
+```
 
-Environment variables
+##### Resilience
+
+The Oracle Peak Agent is written in a way that if either bettercap or MQTT broker are down it will partially 
+restart and back-off with following settings. Making the system more resilient to networking problems.
+
+Backoff strategy for Bettercap service 
+- Minimal backoff: 10 seconds
+- Maximal backoff: 2 minutes
+- Random factor: 40%
+
+Backoff strategy for MQTT broker service 
+- Minimal backoff: 6 seconds
+- Maximal backoff: 20 minutes
+- Random factor: 20%
+
+#### Environment variables
 
 - `MQTT_BROKER=tcp://mqtt.eclipse.org`
 - `MQTT_CLIENT_ID=oracle-peak-development-client-XXX`
@@ -35,6 +61,15 @@ Environment variables
 - `BETTERCAP_URL=http://192.168.33.33:3333`
 - `BETTERCAP_USER=user`
 - `BETTERCAP_PASSWORD=pass`
+
+### Hardware (WIP)
+
+The current setup (although not yet finalised) for collection part of this project consists of
+
+- [Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
+- [Alfa Network AWUS036NH USB 2.0 Highpower WLAN Adapter and 5dBi antenna](https://wlan-profi-shop.de/Alfa-Network-AWUS036NH/GE-RT3070-USB-20-Highpower-WLAN-Adapter-2000mW-2W-and-5dBi-antenna)
+- [Lumsing 60W 6 Ports Desktop USB Charger](https://www.amazon.co.uk/Lumsing-Desktop-Charger-Intelligent-Motorola-blue/dp/B01N2LCNED)
+
 
 ## Development
 
