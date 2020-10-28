@@ -53,7 +53,7 @@ object Settings {
     publishLocal := {},
     // publishArtifact := false,
     publishMavenStyle := false,
-    // publishArtifact := false,
+    publishArtifact := true,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )

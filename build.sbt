@@ -23,7 +23,7 @@ lazy val core = (project in file("oracle-peak/core"))
   // publish := {},
   // publishLocal := {},
   // publishArtifact := false,
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
 )
 
 lazy val agent = (project in file("oracle-peak/agent"))
@@ -71,7 +71,7 @@ lazy val agent = (project in file("oracle-peak/agent"))
     // publish := {},
     // publishLocal := {},
     // publishArtifact := false,
-    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
   )
 
 
@@ -85,7 +85,7 @@ lazy val processor = (project in file("oracle-peak/processor"))
   // publish := {},
   // publishLocal := {},
   // publishArtifact := false,
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-processor")))
 )
 
 // publishTo in ThisBuild := false
