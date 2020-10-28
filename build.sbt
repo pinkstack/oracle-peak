@@ -19,7 +19,12 @@ lazy val core = (project in file("oracle-peak/core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     buildInfoPackage := "com.pinkstack.oraclepeak"
-  )
+  ).settings(
+  publish := {},
+  publishLocal := {},
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+)
 
 lazy val agent = (project in file("oracle-peak/agent"))
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging, DockerPlugin)
