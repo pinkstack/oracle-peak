@@ -31,5 +31,5 @@ jobs:
 
       - name: Compile, build and publish Docker Image
         run: |
-          sbt "clean; compile; docker:publishLocal" && \
+          sbt "clean; compile; agent/docker:publishLocal" && \
             docker push ghcr.io/pinkstack/oracle-peak-agent-arm32v7
