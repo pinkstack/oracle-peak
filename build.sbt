@@ -39,6 +39,8 @@ lazy val agent = (project in file("oracle-peak/agent"))
     dockerBaseImage := "arm32v7/adoptopenjdk:11-jre-hotspot-bionic",
     dockerExposedPorts := Seq.empty[Int],
     dockerExposedUdpPorts := Seq.empty[Int],
+
+    /*
     dockerCommands := dockerCommands.value.flatMap {
       case add@Cmd("RUN", args@_*) if args.contains("id") =>
         List(
@@ -52,6 +54,8 @@ lazy val agent = (project in file("oracle-peak/agent"))
         )
       case other => List(other)
     },
+   
+     */
     dockerAliases ++= Seq(
       dockerAlias.value.withRegistryHost(Option("ghcr.io"))
         .withUsername(Option("pinkstack"))
