@@ -89,6 +89,6 @@ lazy val processor = (project in file("oracle-peak/processor"))
   publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-processor")))
 )
 
-publishTo in ThisBuild := false
+publishTo in ThisBuild := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-root")))
 publishArtifact := false
 // skip in publish := true
