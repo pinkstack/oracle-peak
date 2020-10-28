@@ -31,6 +31,7 @@ lazy val agent = (project in file("oracle-peak/agent"))
   .settings(sharedSettings: _*)
   .settings(
     name := "agent",
+    dockerRepository := Some("ghcr.io"),
     buildInfoPackage := "com.pinkstack.oraclepeak.agent",
     mainClass in(Compile, packageBin) := Some("com.pinkstack.oraclepeak.agent.Agent"),
     maintainer in Docker := "Oto Brglez - <otobrglez@gmail.com>",
