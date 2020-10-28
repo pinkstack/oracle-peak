@@ -22,16 +22,14 @@ lazy val core = (project in file("oracle-peak/core"))
   )
 
 lazy val agent = (project in file("oracle-peak/agent"))
-  .dependsOn(core)
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging, DockerPlugin)
   .settings(sharedSettings: _*)
-  .enablePlugins()
   .settings(
     name := "agent",
     buildInfoPackage := "com.pinkstack.oraclepeak.agent",
-
-    // Docker Image
+    mainClass in(Compile, packageBin) := Some("com.pinkstack.oraclepeak.agent.Agent"),
     maintainer in Docker := "Oto Brglez - <otobrglez@gmail.com>",
+    // aggregate in Docker := true,
     dockerUsername := Some("pinkstack"),
     packageName in Docker := "oracle-peak-agent-arm32v7",
     dockerUpdateLatest := false,
@@ -54,7 +52,7 @@ lazy val agent = (project in file("oracle-peak/agent"))
         )
       case other => List(other)
     },
-   
+
      */
     dockerAliases ++= Seq(
       dockerAlias.value.withRegistryHost(Option("ghcr.io"))
@@ -62,8 +60,9 @@ lazy val agent = (project in file("oracle-peak/agent"))
         .withName("oracle-peak-agent-arm32v7")
         .withTag(Option(version.value))
     )
+  ).dependsOn(core)
+  .aggregate(core)
 
-  )
 
 lazy val processor = (project in file("oracle-peak/processor"))
   .settings(sharedSettings: _*)
@@ -74,5 +73,5 @@ lazy val processor = (project in file("oracle-peak/processor"))
   )
 
 // publishTo in ThisBuild := false
-publishArtifact := false
-skip in publish := true
+// publishArtifact := false
+// skip in publish := true

@@ -7,7 +7,10 @@ import akka.stream.alpakka.mqtt._
 import akka.stream.alpakka.mqtt.scaladsl._
 import akka.stream.scaladsl._
 import com.pinkstack.oraclepeak.core.Model._
-import com.pinkstack.oraclepeak.core.{Configuration, bettercap}
+import com.pinkstack.oraclepeak.core.Configuration
+import com.pinkstack.oraclepeak.core.Configuration._
+import com.pinkstack.oraclepeak.core.bettercap
+
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future

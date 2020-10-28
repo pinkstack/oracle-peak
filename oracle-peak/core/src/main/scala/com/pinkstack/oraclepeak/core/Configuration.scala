@@ -12,7 +12,9 @@ object Configuration {
 
   final case class Mqtt(broker: String, clientId: String, root: String, emit: Boolean)
 
-  final case class Config(bettercap: Bettercap, neo4j: Neo4j, mqtt: Mqtt)
+  final case class Config(bettercap: Bettercap,
+                          neo4j: Neo4j,
+                          mqtt: Mqtt)
 
   final def load: Config = ConfigSource.default.at("oracle-peak").loadOrThrow[Config]
 }
