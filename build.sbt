@@ -20,9 +20,9 @@ lazy val core = (project in file("oracle-peak/core"))
   .settings(
     buildInfoPackage := "com.pinkstack.oraclepeak"
   ).settings(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false,
+  // publish := {},
+  // publishLocal := {},
+  // publishArtifact := false,
   publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 )
 
@@ -68,9 +68,9 @@ lazy val agent = (project in file("oracle-peak/agent"))
   ).dependsOn(core)
   .aggregate(core)
   .settings(
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false,
+    // publish := {},
+    // publishLocal := {},
+    // publishArtifact := false,
     publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
   )
 
@@ -82,9 +82,9 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .settings(libraryDependencies ++=
     Dependencies.neo4j
   ).settings(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false,
+  // publish := {},
+  // publishLocal := {},
+  // publishArtifact := false,
   publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
 )
 
