@@ -75,9 +75,8 @@ Backoff strategy for MQTT broker service
 
 The Oracle Peak Agent comes pre-compiled and pre-packaged for following architectures respectfully:
 
-- [`x86_64`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent) - [`ghcr.io/pinkstack/oracle-peak-agent:latest`]((https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent))
-- [`arm32v7`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7) - [`ghcr.io/pinkstack/ooracle-peak-agent-arm32v7:latest`]((https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7))
-
+- [`x86_64`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent) - [`ghcr.io/pinkstack/oracle-peak-agent:latest`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent)
+- [`arm32v7`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7) - [`ghcr.io/pinkstack/ooracle-peak-agent-arm32v7:latest`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7)
 
 #### Upgrading and device management
 
