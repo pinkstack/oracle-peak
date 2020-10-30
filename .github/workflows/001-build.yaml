@@ -23,7 +23,9 @@ jobs:
 
       - name: Login to Github Container Registry
         run: |
-          docker login --username ${{ github.actor }} --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
+          docker login \
+            --username ${{ github.actor }} \
+            --password $(echo "${{ secrets.CR_PAT }}") ghcr.io
 
       - uses: olafurpg/setup-scala@v10
         with:

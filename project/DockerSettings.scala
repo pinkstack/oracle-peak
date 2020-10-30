@@ -40,7 +40,9 @@ object DockerSettings {
     },
     dockerAliases ++= Seq(
       dockerAlias.value.withName("oracle-peak-agent")
-    )
+    ) ++ (if (sys.env.contains("CI")) Seq {
+      dockerAlias.value.withTag(Option("latest"))
+    } else Seq.empty)
   )
 
   lazy val armV7DockerSettings = sharedDockerSettings ++ Seq(
@@ -58,7 +60,9 @@ object DockerSettings {
     },
     dockerAliases ++= Seq(
       dockerAlias.value.withName("oracle-peak-agent-arm32v7")
-    )
+    ) ++ (if (sys.env.contains("CI")) Seq {
+      dockerAlias.value.withTag(Option("latest"))
+    } else Seq.empty)
   )
 }
 

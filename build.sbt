@@ -24,14 +24,11 @@ lazy val core = (project in file("oracle-peak/core"))
   .settings(
     buildInfoPackage := "com.pinkstack.oraclepeak"
   ).settings(
-  // publish := {},
-  // publishLocal := {},
-  // publishArtifact := false,
   publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
 )
 
 lazy val agent = (project in file("oracle-peak/agent"))
-  // .withId("agent")
+  .withId("agent")
   .enablePlugins(BuildInfoPlugin)
   .settings(sharedSettings: _*)
   .settings(buildInfoPackage := "com.pinkstack.oraclepeak.agent")
@@ -51,9 +48,6 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .settings(libraryDependencies ++=
     Dependencies.neo4j
   ).settings(
-  // publish := {},
-  // publishLocal := {},
-  // publishArtifact := false,
   publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-processor")))
 )
 
@@ -75,4 +69,3 @@ lazy val agentArmV7 = agent
 
 publishTo in ThisBuild := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-root")))
 publishArtifact := false
-// skip in publish := true

@@ -3,11 +3,11 @@
 ## The Mission
 
 The purpose of the Oracale Peak experiments and research is to explore and build real-time software 
-needed to visualise and understand the activity and behaviour of WiFi users and their devices.
+needed to visualise and understand the activity and behaviour of Wi-Fi users and their devices.
 
 The core objectives of the projects are
 
-1. Build or use tools for **information extraction** from WiFi Access Points (APs) and WiFi Clients.
+1. Build or use tools for **information extraction** from WiFi Access Points (APs) and Wi-Fi Clients.
 With specific focus on key data points like `BSSID`s, `ESSID`s, `MAC`'s, Authentication algorithms, 
 manufacturer information and time related activity.
 2. Build **real-time** and low latency resilient pipelining for processing.
@@ -26,7 +26,7 @@ service with the access to bettercap (REST API).
 1. Install Bettercap by following [this instructions](https://www.bettercap.org/installation/).
 2. Install Docker by following [this instructions (for RPi v3)](https://phoenixnap.com/kb/docker-on-raspberry-pi).
 3. Run the following command on RPi (v3) that will boot the agent. 
-The agent will then read data from bettercap's REST API endpoints transform it 
+The agent will then read data from Bettercap's REST API endpoints transform it 
 and feed to MQTT topic of your chose. 
 
 ```bash
@@ -34,9 +34,14 @@ docker run -d --name=agent \
     -e MQTT_CLIENT_ID=device-one \
     -e MQTT_ROOT_TOPIC=oracle-peak-staging/location-one \
     -e BETTERCAP_URL=http://127.0.0.1:8081 \
-    --network=host --restart=always \
-    ghcr.io/pinkstack/oracle-peak-agent-arm32v7:0.0.8
+    --network=host \
+    --restart=always \
+    ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest
 ```
+
+> 💡 You can find systemd service definition examples for bettercap [here](utils/bettercap.service) or [here](utils/bettercap-nuc.service). 
+> It might be wise to start bettercap at system's boot sequence. Meaning if device used for monitoring
+> goes down oracle-peak-agent and bettercap will be also restarted and put back into collection and emitting state.
 
 ##### Resilience
 

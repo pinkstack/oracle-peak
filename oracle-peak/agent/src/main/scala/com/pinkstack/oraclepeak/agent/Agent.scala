@@ -8,7 +8,6 @@ import akka.stream.alpakka.mqtt.scaladsl._
 import akka.stream.scaladsl._
 import com.pinkstack.oraclepeak.core.Model._
 import com.pinkstack.oraclepeak.core.Configuration
-import com.pinkstack.oraclepeak.core.Configuration._
 import com.pinkstack.oraclepeak.core.bettercap
 
 import com.typesafe.scalalogging.LazyLogging
@@ -19,7 +18,11 @@ import scala.concurrent.duration._
 object Agent extends App with LazyLogging {
   implicit val config: Configuration.Config = Configuration.load
   implicit val system: ActorSystem = ActorSystem("agent")
-  implicit val root: MMessage.Path = config.mqtt.root
+
+  implicit val root: MMessage.Path = {
+    import MMessage._
+    config.mqtt.root / config.mqtt.clientId
+  }
 
   println(
     s"""\n🏔 🏔 Oracle Peak Agent 🏔 🏔\n
@@ -33,18 +36,18 @@ object Agent extends App with LazyLogging {
        |Name: ${BuildInfo.name}
        |SBT Version: ${BuildInfo.sbtVersion}
        |Scala Version: ${BuildInfo.scalaVersion}
-       |Version: ${BuildInfo.version}
+       |Oracle Peak Version: ${BuildInfo.version}
        |---
        |Bettercap URL: ${config.bettercap.url}
        |---
-       |MQTT root: $root
-       |MQTT broker: ${config.mqtt.broker}
-       |MQTT emit out: ${config.mqtt.emit}
+       |MQTT Client ID: ${config.mqtt.clientId}
+       |MQTT Root: $root
+       |MQTT Broker: ${config.mqtt.broker}
+       |MQTT Emit out: ${config.mqtt.emit}
        |""".stripMargin)
 
   lazy val mqttSink: Sink[MqttMessage, Future[Done]] = {
     logger.info(s"MQTT Sink with broker ${config.mqtt.broker} with root $root")
-    // AtMostOnce = 0 , AtLeastOnce = 1
     MqttSink(MqttSettings().withConnectionTimeout(5.seconds), MqttQoS.AtMostOnce)
   }
 
@@ -57,7 +60,7 @@ object Agent extends App with LazyLogging {
     )
     .via(SessionToMessage.apply)
     .map(_.asMqttMessage)
-    .runWith(RestartSink.withBackoff(RestartSettings(6.seconds, 20.seconds, 0.2)) {
-      () => EndSink
+    .runWith(RestartSink.withBackoff(RestartSettings(6.seconds, 20.seconds, 0.2)) { () =>
+      EndSink
     })
 }

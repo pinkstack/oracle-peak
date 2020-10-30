@@ -2,9 +2,9 @@
 
 > This document contains random blubs and peaces,...
 
-### WiFi Config and troubleshooting
+### Wi-Fi Config and troubleshooting
 
-- How to get list of available WiFi Devices?
+- How to get list of available Wi-Fi Devices?
     ```bash
     sudo lshw -C network # => MAC (under serial)
     sudoo ifconfig # look for MAC
@@ -62,3 +62,12 @@ docker run -it --rm -p 8081:8081 --privileged --net=host bettercap/dev -caplet h
 
 ```
 
+
+```bash
+docker run -it --rm --privileged --net=host bettercap/dev \
+  -no-colors -eval "set api.rest.username dodo; set api.rest.password pass; set api.rest.address 0.0.0.0; set http.server.address 0.0.0.0; api.rest on; set wifi.interface wlx00c0caac1f73; wifi.recon on"
+
+scp utils/bettercap.service pi@oracle-man-home:~/ && ssh pi@oracle-man-home -x "sudo cp /home/pi/bettercap.service /etc/systemd/system/"
+
+scp utils/bettercap-nuc.service otobrglez@nuc-home:~/ && ssh otobrglez@nuc-home -x "sudo cp /home/otobrglez/bettercap-nuc.service /etc/systemd/system/bettercap.service"
+```
