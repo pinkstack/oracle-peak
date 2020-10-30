@@ -5,8 +5,7 @@ object Dependencies {
   private lazy val Akka: Version = "2.6.10"
   private lazy val AkkaHttp: Version = "10.2.1"
   private lazy val Circe: Version = "0.13.0"
-  private lazy val Cats: Version = "2.0.0"
-  private lazy val Shapeless: Version = "2.3.3"
+  private lazy val Cats: Version = "2.2.0"
 
   lazy val akka: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor",

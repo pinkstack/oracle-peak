@@ -30,12 +30,13 @@ object Settings {
       "-feature",
       "-explaintypes",
       "-unchecked",
-      "-Xlint:-unused,_",
+      // "-Xlint:-unused,_",
+      // "-Xlint:byname-implicit", // https://github.com/scala/bug/issues/12072
       "-language:implicitConversions",
       "-language:higherKinds",
       "-language:postfixOps",
-      "-Yrangepos"
-      // "-target:jvm-1.11"
+      "-Yrangepos",
+      "-target:11"
     ),
 
     resolvers ++= Seq(
@@ -48,9 +49,7 @@ object Settings {
 
     publish := {},
     publishLocal := {},
-    // publishArtifact := false,
     publishMavenStyle := false,
-    // publishArtifact := false,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
   )

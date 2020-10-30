@@ -12,7 +12,7 @@
       shell: |
         (docker stop agent || true) && (docker rm agent || true)
 
-    - name: "Run container in dettached mode"
+    - name: "Run container in detached mode"
       shell: |
         docker run --name=agent \
           --network=host \

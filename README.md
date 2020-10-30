@@ -80,7 +80,7 @@ The Oracle Peak Agent comes pre-compiled and pre-packaged for following architec
 
 #### Upgrading and device management
 
-For this research we used Ansible and [Ansible Playbooks](playbooks) to pull and run Docker containers for oracle-peak-agent.
+For this research we used Ansible and [our Ansible Playbooks](playbooks) to pull and run Docker containers for oracle-peak-agent.
 
 ```bash
 $ ansible-playbook playbooks/update-agents.yml

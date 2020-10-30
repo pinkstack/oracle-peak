@@ -3,10 +3,6 @@ import Keys._
 import Settings._
 import Dependencies._
 import DockerSettings._
-import sbt.Keys.resolvers
-import com.typesafe.sbt.SbtNativePackager.autoImport._
-import com.typesafe.sbt.packager.docker.Cmd
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 
 lazy val core = (project in file("oracle-peak/core"))
   .withId("core")
@@ -24,17 +20,16 @@ lazy val core = (project in file("oracle-peak/core"))
   .settings(
     buildInfoPackage := "com.pinkstack.oraclepeak"
   ).settings(
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-core")))
 )
 
 lazy val agent = (project in file("oracle-peak/agent"))
   .withId("agent")
+  .settings(name := "agent")
   .enablePlugins(BuildInfoPlugin)
   .settings(sharedSettings: _*)
   .settings(buildInfoPackage := "com.pinkstack.oraclepeak.agent")
-  .settings(
-    name := "agent",
-  ).dependsOn(core)
+  .dependsOn(core)
   .aggregate(core)
   .settings(
     publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
@@ -52,7 +47,6 @@ lazy val processor = (project in file("oracle-peak/processor"))
 )
 
 lazy val agentDefaultArch = agent
-  .withId("agentDefaultArch")
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(defaultArchSettings: _*)
   .settings(target := {
@@ -60,7 +54,6 @@ lazy val agentDefaultArch = agent
   })
 
 lazy val agentArmV7 = agent
-  .withId("agentArmV7")
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(armV7DockerSettings: _*)
   .settings(target := {
