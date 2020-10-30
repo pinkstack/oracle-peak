@@ -1,4 +1,4 @@
-## Notes
+#  Notes
 
 > This document contains random blubs and peaces,...
 
@@ -54,3 +54,11 @@ pip install -r requirements.txt --upgrade pip
 - [wifi-enable-monitoring.yml](playbooks/wifi-enable-monitoring.yml) - Put WiFi card into "monitoring mode".
 - [turn-leds-off.yml](playbooks/turn-leds-off.yml) - Turn all RPi LED's OFF
 - [turn-leds-on.yml](playbooks/turn-leds-on.yml) - Turn all RPi LED's ON
+
+```bash
+$ sudo airmon-ng start wlx00c0caac1f73
+
+docker run -it --rm -p 8081:8081 --privileged --net=host bettercap/dev -caplet http-ui -eval "set api.rest on; set wifi.interface wlx00c0caac1f73; wifi.recon on" --no-colors
+
+```
+

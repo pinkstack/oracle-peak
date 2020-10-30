@@ -1,11 +1,10 @@
 import sbt._
 import sbt.Keys._
 import sbt.nio.Keys._
+import sbt.{Def, Resolver, _}
 
 object Settings {
   lazy val sharedSettings = Seq(
-    // version := "0.0.1",
-
     scalaVersion := "2.13.3",
     organizationName := "Pinkstack",
     organization := "com.pinkstack.oraclepeak",
@@ -20,7 +19,6 @@ object Settings {
     licenses += ("MIT", new URL("https://opensource.org/licenses/MIT")),
     licenses += ("BSD-2-Clause-Patent", new URL("https://opensource.org/licenses/BSDplusPatent")),
 
-
     Compile / packageDoc / mappings := Seq(),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
 
@@ -28,7 +26,6 @@ object Settings {
     Test / javaOptions ++= Seq("-Xmx2g"),
 
     scalacOptions ++= Seq(
-      "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
       "-explaintypes",

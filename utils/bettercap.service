@@ -1,0 +1,16 @@
+[Unit]
+Description=Bettercap Monitoring (for RPi v3)
+Documentation=https://bettercap.org
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+PermissionsStartOnly=true
+ExecStartPre=/usr/sbin/airmon-ng start wlx00c0ca584be9
+ExecStart=/home/pi/go/bin/bettercap -no-colors -caplet http-ui -eval 'set api.rest on; set wifi.interface wlx00c0ca584be9; wifi.recon on'
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
