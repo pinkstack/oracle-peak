@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: true
+  gather_facts: True
+  gather_subset: interfaces
+
+  tasks:
+    - name: "Pull latest oracle-peak-agent"
+      shell: |
+        docker pull {{ docker_image }}
+    - name: "Stop and remove oracle-peak-agent containers"
+      shell: |
+        (docker stop agent || true) && (docker rm agent || true)
+
+    - name: "Run container in dettached mode"
+      shell: |
+        docker run --name=agent \
+          --network=host \
+          -e MQTT_CLIENT_ID="{{ mqtt_client_id }}" \
+          -e MQTT_ROOT_TOPIC="{{ mqtt_root_topic }}" \
+          -e BETTERCAP_URL="{{ bettercap_url }}" \
+          -d \
+          --restart=always \
+          {{ docker_image }}

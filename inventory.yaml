@@ -1,7 +1,28 @@
 all:
-  hosts:
-    oreacle-man:
-      # ansible_host: 192.168.64.117
-      ansible_host: oracle-man-krk
-      ansible_user: pi
-      become: yes
+  children:
+    pies:
+      children:
+        v3s:
+          hosts:
+            oracle-man:
+              ansible_host: oracle-man-home
+              become: yes
+
+              # Agent specific
+              mqtt_client_id: oracle-man
+              mqtt_root_topic: oracle-peak-staging/location-one
+          vars:
+            docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
+    nucs:
+      hosts:
+        nuc:
+          ansible_host: nuc-home
+          become: yes
+
+          # Agent specific
+          mqtt_client_id: nuc
+          mqtt_root_topic: oracle-peak-staging/location-one
+      vars:
+        docker_image: "ghcr.io/pinkstack/oracle-peak-agent:latest"
+  vars:
+    bettercap_url: http://127.0.0.1:8081

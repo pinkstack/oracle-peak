@@ -70,4 +70,11 @@ docker run -it --rm --privileged --net=host bettercap/dev \
 scp utils/bettercap.service pi@oracle-man-home:~/ && ssh pi@oracle-man-home -x "sudo cp /home/pi/bettercap.service /etc/systemd/system/"
 
 scp utils/bettercap-nuc.service otobrglez@nuc-home:~/ && ssh otobrglez@nuc-home -x "sudo cp /home/otobrglez/bettercap-nuc.service /etc/systemd/system/bettercap.service"
+
+docker run -ti --rm \
+    -e MQTT_CLIENT_ID=device-nuc \
+    -e MQTT_ROOT_TOPIC=oracle-peak-staging/location-one \
+    -e BETTERCAP_URL=http://127.0.0.1:8081 \
+    --network=host \
+    ghcr.io/pinkstack/oracle-peak-agent:latest
 ```

@@ -1,5 +1,8 @@
 # 🏔 The Oracle Peak 🏔
 
+![CI](https://github.com/pinkstack/oracle-peak/workflows/CI/badge.svg?branch=master)
+
+
 ## The Mission
 
 The purpose of the Oracale Peak experiments and research is to explore and build real-time software 
@@ -19,7 +22,7 @@ manufacturer information and time related activity.
 
 One of the key components of this system is [oracle-peak-agent](oracle-peak/agent), an agent that needs to be deployed
 either on the device where collection is happening (Respeberry Pi in following example) or on some external 
-service with the access to bettercap (REST API).
+service with the access to Bettercap (REST API).
 
 #### Setup
 
@@ -39,13 +42,13 @@ docker run -d --name=agent \
     ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest
 ```
 
-> 💡 You can find systemd service definition examples for bettercap [here](utils/bettercap.service) or [here](utils/bettercap-nuc.service). 
-> It might be wise to start bettercap at system's boot sequence. Meaning if device used for monitoring
-> goes down oracle-peak-agent and bettercap will be also restarted and put back into collection and emitting state.
+> 💡 You can find systemd service definition examples for Bettercap [here](utils/bettercap.service) or [here](utils/bettercap-nuc.service). 
+> It might be wise to start Bettercap at system's boot sequence. Meaning if device used for monitoring
+> goes down oracle-peak-agent and Bettercap will be also restarted and put back into collection and emitting state.
 
 ##### Resilience
 
-The Oracle Peak Agent is written in a way that if either bettercap or MQTT broker are down it will partially 
+The Oracle Peak Agent has been written in a way that if either bettercap or MQTT broker are down it will partially 
 restart and back-off with following settings. Making the system more resilient to networking problems.
 
 Backoff strategy for Bettercap service 
@@ -68,6 +71,25 @@ Backoff strategy for MQTT broker service
 - `BETTERCAP_USER=user`
 - `BETTERCAP_PASSWORD=pass`
 
+#### Images
+
+The Oracle Peak Agent comes pre-compiled and pre-packaged for following architectures respectfully:
+
+- [`x86_64`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent) - [`ghcr.io/pinkstack/oracle-peak-agent:latest`]((https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent))
+- [`arm32v7`](https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7) - [`ghcr.io/pinkstack/ooracle-peak-agent-arm32v7:latest`]((https://github.com/orgs/pinkstack/packages/container/package/oracle-peak-agent-arm32v7))
+
+
+#### Upgrading and device management
+
+For this research we used Ansible and [Ansible Playbooks](playbooks) to pull and run Docker containers for oracle-peak-agent.
+
+```bash
+$ ansible-playbook playbooks/update-agents.yml
+```
+
+Obviously you would need to define your own inventory; but feel free to take inspiration in [ours](./inventory.yaml); especially if you want to
+deploy this on multiple devices with multiple architectures.
+
 ### Hardware (WIP)
 
 The current setup (although not yet finalised) for collection part of this project consists of
@@ -84,13 +106,8 @@ The current setup (although not yet finalised) for collection part of this proje
 ```bash
 $ sbt "project agent; run"
 ```
-### Releases
-
-```sbt
-release release-version 0.0.2 next-version 0.0.3
-```
 
 ## Authors
 
-- [Oto Brglez](https://github.com/otobrglez)
-- [Andraž Sraka](https://github.com/lowk3y)
+- [Oto Brglez](https://github.com/otobrglez), [@otobrglez](https://twitter.com/otobrglez)
+- [Andraž Sraka](https://github.com/lowk3y), [@lowk3y](https://twitter.com/lowk3y)
