@@ -1,0 +1,18 @@
+GET http://kafka-one-cp-kafka-connect:8083/connector-plugins
+
+###
+PUT http://kafka-one-cp-kafka-connect:8083/connectors/HelloMqttTest/config
+Accept: application/json
+Content-Type: application/json
+
+
+{
+  "name": "HelloMqttTest",
+  "config": {
+    "connector.class": "io.confluent.connect.mqtt.MqttSourceConnector",
+    "mqtt.server.uri": "tcp://mqtt.eclipse.org",
+    "confluent.topic.bootstrap.servers": "kafka-one-cp-kafka-headless:9092",
+    "mqtt.topics": "oracle-peak-staging/location-one/oracle-man/session, oracle-peak-staging/location-one/nuc/session",
+    "tasks.max": 1
+  }
+}

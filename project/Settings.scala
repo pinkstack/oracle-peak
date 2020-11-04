@@ -30,8 +30,6 @@ object Settings {
       "-feature",
       "-explaintypes",
       "-unchecked",
-      // "-Xlint:-unused,_",
-      // "-Xlint:byname-implicit", // https://github.com/scala/bug/issues/12072
       "-language:implicitConversions",
       "-language:higherKinds",
       "-language:postfixOps",
