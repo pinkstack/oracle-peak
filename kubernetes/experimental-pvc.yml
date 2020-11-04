@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: experimental-pvc
+  namespace: experimenting
+spec:
+  # access mode:
+  # - ReadWriteMany (RW from multi nodes)
+  # - ReadWriteOnce (RW from a node)
+  # - ReadOnlyMany (R from multi nodes)
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: microk8s-hostpath
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-mypv
+  labels:
+    name: nginx-mypv
+spec:
+  containers:
+    - name: nginx-mypv
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+      volumeMounts:
+        - name: experimental-pvc
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: experimental-pvc
+      persistentVolumeClaim:
+        # specify PVC name you defined
+        claimName: experimental-pvc
