@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization._
 import akka.stream.scaladsl.Sink
 import org.apache.kafka.clients.consumer.ConsumerConfig
 
+
 object Kafka2Neo4jMain extends App with LazyLogging {
   implicit val config: Configuration.Config = Configuration.load
   implicit val system: ActorSystem = ActorSystem("kafka-to-neo4j")
@@ -18,17 +19,17 @@ object Kafka2Neo4jMain extends App with LazyLogging {
   import system.dispatcher
 
   val configTwo = system.settings.config.getConfig("akka.kafka.consumer")
-  val bootstrapServers: String = "kafka-one-cp-kafka-headless:9092"
+  val bootstrapServers: String = "one-cp-kafka-headless:9092"
 
   val consumerSettings =
     ConsumerSettings(configTwo, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(bootstrapServers)
-      .withGroupId("group1")
+      .withGroupId("sessions-processor-1")
   // .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
   // .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
   val done = Consumer
-    .plainSource(consumerSettings, Subscriptions.topics("wifi-aps-client-sizes"))
+    .plainSource(consumerSettings, Subscriptions.topics("raw-sessions"))
     .map(msg => {
       (
         msg.key(),
