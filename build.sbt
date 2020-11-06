@@ -7,44 +7,45 @@ import DockerSettings._
 lazy val core = (project in file("oracle-peak/core"))
   .withId("core")
   .settings(sharedSettings: _*)
-  .settings(name := "core")
-  .settings(libraryDependencies ++=
-    Dependencies.akka ++
-      Dependencies.alpakka ++
-      Dependencies.fp ++
-      Dependencies.circe ++
-      Dependencies.configurationLibs ++
-      Dependencies.logging ++
-      Dependencies.testing)
-  .enablePlugins(BuildInfoPlugin)
   .settings(
-    buildInfoPackage := "com.pinkstack.oraclepeak"
-  ).settings(
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-core")))
-)
+    name := "core",
+    libraryDependencies ++=
+      Dependencies.akka ++
+        Dependencies.fp ++
+        Dependencies.circe ++
+        Dependencies.configurationLibs ++
+        Dependencies.logging ++
+        Dependencies.testing,
+    buildInfoPackage := "com.pinkstack.oraclepeak",
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-core")))
+  )
+  .enablePlugins(BuildInfoPlugin)
 
 lazy val agent = (project in file("oracle-peak/agent"))
-  .withId("agent")
-  .settings(name := "agent")
   .enablePlugins(BuildInfoPlugin)
+  .withId("agent")
   .settings(sharedSettings: _*)
-  .settings(buildInfoPackage := "com.pinkstack.oraclepeak.agent")
-  .dependsOn(core)
-  .aggregate(core)
   .settings(
+    name := "agent",
+    libraryDependencies ++= Dependencies.Alpakka.mqtt,
+    buildInfoPackage := "com.pinkstack.oraclepeak.agent",
     publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-agent")))
   )
+  .dependsOn(core)
+  .aggregate(core)
 
 lazy val processor = (project in file("oracle-peak/processor"))
   .withId("processor")
   .settings(sharedSettings: _*)
-  .settings(name := "processor")
+  .settings(
+    name := "processor",
+    libraryDependencies ++= {
+      Dependencies.Alpakka.kafka ++ Dependencies.neo4j
+    },
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-processor")))
+  )
   .dependsOn(core)
-  .settings(libraryDependencies ++=
-    Dependencies.neo4j
-  ).settings(
-  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo-processor")))
-)
+  .aggregate(core)
 
 lazy val agentDefaultArch = agent
   .enablePlugins(JavaAppPackaging, DockerPlugin)

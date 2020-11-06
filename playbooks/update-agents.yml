@@ -16,7 +16,8 @@
       shell: |
         docker run --name=agent \
           --network=host \
-          -e MQTT_CLIENT_ID="{{ mqtt_client_id }}" \
+          -e CLIENT_ID="{{ client_id }}" \
+          -e LOCATION="{{ location }}" \
           -e MQTT_ROOT_TOPIC="{{ mqtt_root_topic }}" \
           -e BETTERCAP_URL="{{ bettercap_url }}" \
           -d \

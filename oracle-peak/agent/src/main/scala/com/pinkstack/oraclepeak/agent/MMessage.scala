@@ -13,7 +13,7 @@ object MMessage {
   type Path = String
 
   implicit class PathImprovements(val path: Path) {
-    def /(other: String): Path = path + "/" + other
+    def /(other: String): Path = path.appended('/').appendedAll(other)
   }
 
   def apply(path: Path)(content: String)(implicit root: Path): MMessage =

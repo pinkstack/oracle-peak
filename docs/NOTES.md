@@ -51,9 +51,9 @@ pip install -r requirements.txt --upgrade pip
 
 #### Playbooks
 
-- [wifi-enable-monitoring.yml](playbooks/wifi-enable-monitoring.yml) - Put WiFi card into "monitoring mode".
-- [turn-leds-off.yml](playbooks/turn-leds-off.yml) - Turn all RPi LED's OFF
-- [turn-leds-on.yml](playbooks/turn-leds-on.yml) - Turn all RPi LED's ON
+- [wifi-enable-monitoring.yml](../playbooks/wifi-enable-monitoring.yml) - Put WiFi card into "monitoring mode".
+- [turn-leds-off.yml](../playbooks/turn-leds-off.yml) - Turn all RPi LED's OFF
+- [turn-leds-on.yml](../playbooks/turn-leds-on.yml) - Turn all RPi LED's ON
 
 ```bash
 $ sudo airmon-ng start wlx00c0caac1f73

@@ -1,28 +1,46 @@
 all:
   children:
-    pies:
+    collectors:
       children:
-        v3s:
+        pies:
+          children:
+            v3s:
+              hosts:
+                oracle-man:
+                  ansible_host: oracle-man-home
+                  become: yes
+
+                  # Agent specific
+                  client_id: oracle-man
+                  location: location-one
+                  mqtt_root_topic: oracle-peak-staging
+              vars:
+                docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
+        nucs:
           hosts:
-            oracle-man:
-              ansible_host: oracle-man-home
+            nuc:
+              ansible_host: nuc-home
               become: yes
 
               # Agent specific
-              mqtt_client_id: oracle-man
-              mqtt_root_topic: oracle-peak-staging/location-one
+              client_id: nuc
+              location: location-one
+              mqtt_root_topic: oracle-peak-staging
           vars:
-            docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
-    nucs:
-      hosts:
-        nuc:
-          ansible_host: nuc-home
-          become: yes
-
-          # Agent specific
-          mqtt_client_id: nuc
-          mqtt_root_topic: oracle-peak-staging/location-one
+            docker_image: "ghcr.io/pinkstack/oracle-peak-agent:latest"
       vars:
-        docker_image: "ghcr.io/pinkstack/oracle-peak-agent:latest"
-  vars:
-    bettercap_url: http://127.0.0.1:8081
+        bettercap_url: http://127.0.0.1:8081
+    k8:
+      children:
+        masters:
+          hosts:
+            master-1:
+              ansible_host: hetzner-pinkstack-master-1
+        nodes:
+          hosts:
+            node-1:
+              ansible_host: hetzner-pinkstack-node-1
+            node-2:
+              ansible_host: hetzner-pinkstack-node-2
+
+

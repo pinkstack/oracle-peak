@@ -6,3 +6,12 @@ Accept: application/json, text/plain, */*
 GET http://{{bettercap_user}}:{{bettercap_pass}}@{{bettercap_url}}/api/events?n=50
 # Authorization: Basic ZG9kbzpwYXNz
 
+### Kafka Connect Plugins
+GET http://kafka-one-cp-kafka-connect:8083/connector-plugins
+
+### Kafka Connect transformation
+POST http://kafka-one-cp-kafka-connect:8083/connector
+Accept: application/json, text/plain, */*
+Content-Type: text/json
+
+{"class:"io.confluent.connect.elasticsearch.ElasticsearchSinkConnector

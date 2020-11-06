@@ -1,0 +1,15 @@
+# This is kafka-client
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-client
+  namespace: kafka
+spec:
+  containers:
+    - name: kafka-client
+      image: confluentinc/cp-enterprise-kafka:5.5.0
+      command:
+        - sh
+        - -c
+        - "exec tail -f /dev/null"

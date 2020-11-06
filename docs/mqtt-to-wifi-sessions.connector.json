@@ -1,0 +1,16 @@
+{
+  "name": "mqtt-to-wifi-sessions",
+  "config": {
+    "connector.class": "io.confluent.connect.mqtt.MqttSourceConnector",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+    "errors.retry.timeout": "-1",
+    "errors.retry.delay.max.ms": "600000",
+    "mqtt.server.uri": "tcp://mqtt.eclipse.org",
+    "max.retry.time.ms": "600000",
+    "confluent.topic.bootstrap.servers": "one-cp-kafka-headless:9092,one-cp-kafka:9092",
+    "kafka.topic": "raw-sessions",
+    "mqtt.topics": "oracle-peak-staging/location-one/+/session",
+    "mqtt.qos": "1"
+  }
+}
