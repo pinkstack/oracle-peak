@@ -1,12 +1,46 @@
 # Source: https://github.com/confluentinc/cp-helm-charts/blob/master/values.yaml
 
+configurationOverrides:
+  "advertised.listeners": |-
+    EXTERNAL://localhost:$((9093 + ${KAFKA_BROKER_ID}))
+
 cp-kafka-connect:
   image: pinkstack/kafka-connect
   imageTag: 0.0.1
 
+cp-zookeeper:
+  storageClass: microk8s-hostpath
+  persistence:
+    storageClass: microk8s-hostpath
+
+    dataDirSize: 20Gi
+    dataLogDirSize: 20Gi
+
 cp-kafka:
+  storageClass: microk8s-hostpath
   persistence:
     enabled: true
-    # storageClass: ""
-    size: 7Gi
+    storageClass: microk8s-hostpath
+    # dataDirSize: 20Gi
+    # dataLogDirSize: 20Gi
+
+    size: 10Gi
     disksPerBroker: 1
+
+  #nodeport:
+  #  enabled: true
+
+  # configurationOverrides:
+  #   "auto.create.topics.enable": true
+  #   "advertised.listeners": EXTERNAL://${LOAD_BALANCER_IP}:31090
+  #   "listener.security.protocol.map": PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #   "listeners": PLAINTEXT://:9092,EXTERNAL://:31090
+  #   "inter.broker.listener.name": "PLAINTEXT"
+
+    #"listener.security.protocol.map": |-
+    #  PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+    #"advertised.listeners": |-
+    #  EXTERNAL://localhost:$((9093 + ${KAFKA_BROKER_ID}))
+    #  EXTERNAL://${dns_prefix}${deploy_name}$${KAFKA_BROKER_ID}.${domain_name}:9094
+
+# │       export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_NAME}.one-cp-kafka-headless.${POD_NAMESPACE}:9092,EXTERNAL://${HOST_IP}:$((31090 + ${KAFKA_BROKER_ID})) && \                                                                                                           │

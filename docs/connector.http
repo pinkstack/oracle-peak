@@ -5,7 +5,6 @@ PUT http://kafka-one-cp-kafka-connect:8083/connectors/HelloMqttTest/config
 Accept: application/json
 Content-Type: application/json
 
-
 {
   "name": "HelloMqttTest",
   "config": {

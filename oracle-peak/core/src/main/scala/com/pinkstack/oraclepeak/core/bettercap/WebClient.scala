@@ -33,17 +33,6 @@ object WebClient {
   private[this] def baseRequest(implicit config: Configuration.Config): HttpRequest =
     HttpRequest().withHeaders(List(authorization))
 
-  /*
-  private[this] def define[T, TR](request: HttpRequest)
-                                 (transform: Json => TR)
-                                 (implicit system: ActorSystem, config: Configuration.Config): Future[TR] = {
-    import system.dispatcher
-    requestParse(request).map(transform) // .map(_.asArray)
-  }
-
-   */
-
-
   private[this] def execute[T](request: HttpRequest)
                               (transform: Json => T)
                               (implicit system: ActorSystem, config: Configuration.Config): Future[T] = {
@@ -52,12 +41,10 @@ object WebClient {
   }
 
   def session(implicit system: ActorSystem, config: Configuration.Config): Future[Json] =
-    execute(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "session"))) { json =>
-      json.hcursor.value
-    }
+    execute(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "session")))(_.hcursor.value)
 
   def events(implicit system: ActorSystem, config: Configuration.Config): Future[Option[Vector[Json]]] =
-    execute(baseRequest.withUri(uri = uri.withPath(uri.path / "api" / "events").withQuery(Uri.Query(("n", "50"))))) { json =>
-      json.hcursor.value.asArray
-    }
+    execute(baseRequest
+      .withUri(uri = uri.withPath(uri.path / "api" / "events").withQuery(Uri.Query(("n", "50"))))
+    )(_.hcursor.value.asArray)
 }

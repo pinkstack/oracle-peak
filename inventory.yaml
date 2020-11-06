@@ -11,8 +11,9 @@ all:
                   become: yes
 
                   # Agent specific
-                  mqtt_client_id: oracle-man
-                  mqtt_root_topic: oracle-peak-staging/location-one
+                  client_id: oracle-man
+                  location: location-one
+                  mqtt_root_topic: oracle-peak-staging
               vars:
                 docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
         nucs:
@@ -22,8 +23,9 @@ all:
               become: yes
 
               # Agent specific
-              mqtt_client_id: nuc
-              mqtt_root_topic: oracle-peak-staging/location-one
+              client_id: nuc
+              location: location-one
+              mqtt_root_topic: oracle-peak-staging
           vars:
             docker_image: "ghcr.io/pinkstack/oracle-peak-agent:latest"
       vars:

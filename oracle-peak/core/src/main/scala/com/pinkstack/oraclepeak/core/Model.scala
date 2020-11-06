@@ -61,7 +61,17 @@ object Model {
                                 clients: List[Client] = List.empty[Client]
                               ) extends Device
 
-  final case class Session(version: String, os: String, arch: String, wifi: Session.Wifi)
+  trait ISession {
+    def version: String
+
+    def os: String
+
+    def arch: String
+
+    def wifi: Session.Wifi
+  }
+
+  case class Session(version: String, os: String, arch: String, wifi: Session.Wifi) extends ISession
 
   object Session {
 
@@ -139,4 +149,5 @@ object Model {
       }
     }
   }
+
 }

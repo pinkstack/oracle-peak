@@ -21,12 +21,11 @@ object Agent extends App with LazyLogging {
 
   implicit val root: MMessage.Path = {
     import MMessage._
-    config.mqtt.root / config.mqtt.clientId
+    config.mqtt.root / config.location / config.clientId
   }
 
   println(
-    s"""\n🏔 🏔 Oracle Peak Agent 🏔 🏔\n
-       |Java Version: ${System.getProperty("java.version")}
+    s"""🏔 🏔 Oracle Peak Agent 🏔 🏔
        |Java VM Version: ${System.getProperty("java.vm.version")}
        |Java VM Name: ${System.getProperty("java.vm.name")}
        |Java Runtime Version: ${System.getProperty("java.runtime.version")}
@@ -38,9 +37,12 @@ object Agent extends App with LazyLogging {
        |Scala Version: ${BuildInfo.scalaVersion}
        |Oracle Peak Version: ${BuildInfo.version}
        |---
+       |Client ID: ${config.clientId}
+       |Location: ${config.location}
+       |---
        |Bettercap URL: ${config.bettercap.url}
        |---
-       |MQTT Client ID: ${config.mqtt.clientId}
+       |MQTT Client ID: ${config.clientId}
        |MQTT Root: $root
        |MQTT Broker: ${config.mqtt.broker}
        |MQTT Emit out: ${config.mqtt.emit}
@@ -52,7 +54,7 @@ object Agent extends App with LazyLogging {
   }
 
   def EndSink: Sink[MqttMessage, Future[Done]] =
-    Option.when(config.mqtt.emit)(mqttSink).getOrElse(Sink.foreach[MqttMessage](println))
+    Option.when(config.mqtt.emit)(mqttSink).getOrElse(Sink.foreach[MqttMessage](m => println(m.payload.utf8String)))
 
   val f = Source.tick(2.seconds, 2.second, Tick)
     .via(RestartFlow.withBackoff(RestartSettings(10.seconds, 2.minutes, 0.4))(() =>

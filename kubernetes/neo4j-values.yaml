@@ -1,0 +1,8 @@
+# Reference:
+# - https://github.com/neo4j-contrib/neo4j-helm/blob/master/values.yaml
+
+core:
+  persistentVolume:
+    enabled: true
+    storageClass: microk8s-hostpath
+    size: 30Gi

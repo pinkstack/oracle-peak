@@ -5,14 +5,18 @@ import pureconfig.generic.auto._
 import pureconfig.ConfigReader.Result
 
 object Configuration {
+  type ClientID = String
+  type Location = String
 
   final case class Bettercap(url: java.net.URL, user: String, password: String)
 
   final case class Neo4j(url: java.net.URI, user: String, password: String)
 
-  final case class Mqtt(broker: String, clientId: String, root: String, emit: Boolean)
+  final case class Mqtt(broker: String, clientId: ClientID, root: String, emit: Boolean)
 
-  final case class Config(bettercap: Bettercap,
+  final case class Config(clientId: ClientID,
+                          location: Location,
+                          bettercap: Bettercap,
                           neo4j: Neo4j,
                           mqtt: Mqtt)
 
