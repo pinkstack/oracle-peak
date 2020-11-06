@@ -48,6 +48,7 @@ lazy val processor = (project in file("oracle-peak/processor"))
   .aggregate(core)
 
 lazy val agentDefaultArch = agent
+  .withId("agentDefaultArch")
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(defaultArchSettings: _*)
   .settings(target := {
@@ -55,6 +56,7 @@ lazy val agentDefaultArch = agent
   })
 
 lazy val agentArmV7 = agent
+  .withId("agentArmV7")
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(armV7DockerSettings: _*)
   .settings(target := {
