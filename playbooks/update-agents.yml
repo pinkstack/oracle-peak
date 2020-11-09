@@ -1,6 +1,6 @@
 ---
-- hosts: all
-  become: agents
+- hosts: agents
+  become: true
   gather_facts: True
   gather_subset: interfaces
 

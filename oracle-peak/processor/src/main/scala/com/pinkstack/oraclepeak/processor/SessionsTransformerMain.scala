@@ -1,5 +1,7 @@
 package com.pinkstack.oraclepeak.processor
 
+import cats._
+import cats.implicits._
 import akka.actor.ActorSystem
 import akka.kafka._
 import akka.kafka.scaladsl.Consumer
@@ -11,7 +13,7 @@ import akka.stream.scaladsl._
 import scala.util.{Failure, Success}
 import org.apache.kafka.common.serialization._
 import akka.stream.scaladsl.Sink
-import com.pinkstack.oraclepeak.core.Model.{AccessPoint, Session}
+import com.pinkstack.oraclepeak.core.Model._
 import com.typesafe.config.Config
 import io.circe.Decoder.Result
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -27,21 +29,15 @@ case class KafkaSessions()(implicit system: ActorSystem, config: Configuration.C
   )
 
   private lazy val consumerSettings: ConsumerSettings[String, String] = {
-
     val kafkaConsumer: Config = system.settings.config.getConfig("akka.kafka.consumer")
     ConsumerSettings(kafkaConsumer, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(bootstrapServers)
       .withGroupId(groupID)
   }
 
-  def source: Source[(Key, Value), Consumer.Control] = {
+  def source: Source[(Key, Value), Consumer.Control] =
     Consumer.plainSource[Key, Value](consumerSettings, Subscriptions.topics(topics: _*))
       .map(record => (record.key(), record.value()))
-  }
-}
-
-trait Location {
-  def location: Option[String] = None
 }
 
 object TransformSessionFlow {
@@ -50,9 +46,12 @@ object TransformSessionFlow {
 
   def apply() =
     Flow[(String, String)]
-      .map { case (k: String, v: String) =>
-        parse(v).map(_.as[Session].toOption)
-      }
+      .map { case (_: String, v: String) =>
+        parse(v).map(_.as[CollectedSession].toOption).toOption.flatten
+      }.collect {
+      case Some(session: CollectedSession) => session
+      case None => throw new Exception("Could not parse,...")
+    }
 }
 
 object SessionsTransformerMain extends App with LazyLogging {

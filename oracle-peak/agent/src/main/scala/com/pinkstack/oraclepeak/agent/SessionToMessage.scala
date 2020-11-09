@@ -6,26 +6,13 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Configuration.{ClientID, Location}
-import com.pinkstack.oraclepeak.core.Model.{AccessPoint, ISession, Session}
+import com.pinkstack.oraclepeak.core.Model.{AccessPoint, CollectedSession, ISession, Session}
 
 object SessionToMessage {
 
   import MMessage._
   import io.circe.generic.auto._
   import io.circe.syntax._
-
-  trait DeviceMetadata {
-    def clientID: Configuration.ClientID
-
-    def location: Configuration.Location
-  }
-
-  case class CollectedSession(clientID: ClientID,
-                              location: Location,
-                              version: String, os: String, arch: String,
-                              wifi: Session.Wifi,
-                              collectedAt: String = LocalDateTime.now.atOffset(ZoneOffset.UTC).toString)
-    extends ISession with DeviceMetadata
 
   def apply(implicit root: Path, config: Configuration.Config): Flow[Session, MMessage, NotUsed] = {
     // Should we emit everything to MQTT?

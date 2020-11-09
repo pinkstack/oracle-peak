@@ -21,3 +21,5 @@
       community.general.snap:
         name: microk8s
         classic: yes
+        channel: latest
+        # latest1.19/stable

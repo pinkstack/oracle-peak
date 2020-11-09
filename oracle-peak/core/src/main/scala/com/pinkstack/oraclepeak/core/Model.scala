@@ -1,8 +1,9 @@
 package com.pinkstack.oraclepeak.core
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
+import com.pinkstack.oraclepeak.core.Configuration.{ClientID, Location}
 import io.circe._
 import io.circe.optics.JsonPath.root
 
@@ -61,7 +62,7 @@ object Model {
                                 clients: List[Client] = List.empty[Client]
                               ) extends Device
 
-  trait ISession {
+  sealed trait ISession {
     def version: String
 
     def os: String
@@ -71,7 +72,21 @@ object Model {
     def wifi: Session.Wifi
   }
 
+  sealed trait DeviceMetadata {
+    def clientID: Configuration.ClientID
+
+    def location: Configuration.Location
+  }
+
+  case class CollectedSession(clientID: ClientID,
+                              location: Location,
+                              version: String, os: String, arch: String,
+                              wifi: Session.Wifi,
+                              collectedAt: String = LocalDateTime.now.atOffset(ZoneOffset.UTC).toString)
+    extends ISession with DeviceMetadata
+
   case class Session(version: String, os: String, arch: String, wifi: Session.Wifi) extends ISession
+
 
   object Session {
 
