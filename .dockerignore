@@ -4,3 +4,4 @@ project/target
 data/
 data-krk/
 venv/
+*service_account.json
