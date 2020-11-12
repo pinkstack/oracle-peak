@@ -9,6 +9,7 @@ fi
 cd "${ORACLE_PEAK_HOME}"
 
 docker-compose \
-  -f .docker/docker-compose.dev.yml \
+  -f .docker/docker-compose.confluent.yml \
+  -f .docker/docker-compose.confluent.overrides.yml \
   --project-name oracle-peak \
   --project-directory . $@

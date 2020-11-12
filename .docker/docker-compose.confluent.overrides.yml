@@ -1,0 +1,17 @@
+---
+version: '3'
+services:
+  zookeeper:
+    volumes:
+      - ./kafka/zookeeper-1/data:/var/lib/zookeeper/data
+      - ./kafka/zookeeper-1/txn-logs:/var/lib/zookeeper/log
+    environment:
+      LOG_LEVEL: WARN
+  broker:
+    volumes:
+      - ./kafka/kafka-1/data:/var/lib/kafka/data
+  connect:
+    image: pinkstack/kafka-connect:0.0.1
+    build:
+      context: .
+      dockerfile: kafka-connect.Dockerfile
