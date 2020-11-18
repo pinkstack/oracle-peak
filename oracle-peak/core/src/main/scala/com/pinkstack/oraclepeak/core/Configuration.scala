@@ -8,7 +8,13 @@ object Configuration {
   type ClientID = String
   type Location = String
 
-  final case class Bettercap(url: java.net.URL, user: String, password: String)
+  sealed trait Switchable {
+    def enabled: Boolean
+  }
+
+  final case class Bettercap(url: java.net.URL, user: String, password: String, enabled: Boolean) extends Switchable
+
+  final case class Gpsd(url: java.net.URI, enabled: Boolean) extends Switchable
 
   final case class Neo4j(url: java.net.URI, user: String, password: String)
 
@@ -17,6 +23,7 @@ object Configuration {
   final case class Config(clientId: ClientID,
                           location: Location,
                           bettercap: Bettercap,
+                          gpsd: Gpsd,
                           neo4j: Neo4j,
                           mqtt: Mqtt)
 
