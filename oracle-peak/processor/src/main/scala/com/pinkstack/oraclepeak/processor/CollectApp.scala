@@ -6,7 +6,7 @@ import akka.stream.scaladsl._
 import akka.{Done, NotUsed}
 import com.pinkstack.oraclepeak.core.Model._
 import com.pinkstack.oraclepeak.core.Configuration
-import com.pinkstack.oraclepeak.core.bettercap.Flows
+// import com.pinkstack.oraclepeak.agent.bettercap.Flows
 import com.typesafe.scalalogging.LazyLogging
 import org.neo4j.driver._
 
@@ -107,7 +107,7 @@ object CollectApp extends App with LazyLogging {
     Source.tick(0.seconds, 2.seconds, Tick)
       .via(BetterCapCollectionFlow.accessPoints())
       .runWith(Neo4jSink())
-  */
+
 
 
   Source.tick(0.seconds, 2.seconds, Tick)
@@ -126,5 +126,5 @@ object CollectApp extends App with LazyLogging {
   f.onComplete {
     case Success(value) => println(value)
     case Failure(exception) => System.err.println(exception)
-  }
+  } */
 }

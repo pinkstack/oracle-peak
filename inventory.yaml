@@ -7,11 +7,20 @@ all:
             v3s:
               hosts:
                 oracle-man:
-                  ansible_host: oracle-man-home
+                  # ansible_host: oracle-man-home
+                  ansible_host: oracle-man-geekatrons
                   become: yes
 
                   # Agent specific
                   client_id: oracle-man
+                  location: location-one
+                  mqtt_root_topic: oracle-peak-staging
+                blackbox:
+                  ansible_host: blackbox-home
+                  become: yes
+
+                  # Agent specific
+                  client_id: blackbox
                   location: location-one
                   mqtt_root_topic: oracle-peak-staging
               vars:
