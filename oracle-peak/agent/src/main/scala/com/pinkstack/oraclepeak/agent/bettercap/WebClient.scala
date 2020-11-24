@@ -1,4 +1,4 @@
-package com.pinkstack.oraclepeak.core.bettercap
+package com.pinkstack.oraclepeak.agent.bettercap
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

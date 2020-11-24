@@ -1,4 +1,4 @@
-package com.pinkstack.oraclepeak.core.bettercap
+package com.pinkstack.oraclepeak.agent.bettercap
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -24,7 +24,9 @@ object Flows extends LazyLogging {
       WebClient.session.map(_.as[Session].toOption)
     ).collect {
       case Some(value: Session) => value
-      case None => throw new Exception("Failed parsing session")
+      case None =>
+        println("FAIL")
+        throw new Exception("Failed parsing session")
     }.named("session")
   }
 
