@@ -20,6 +20,8 @@
           -e LOCATION="{{ location }}" \
           -e MQTT_ROOT_TOPIC="{{ mqtt_root_topic }}" \
           -e BETTERCAP_URL="{{ bettercap_url }}" \
+          -e GPSD_URL="{{ gpsd_url }}" \
+          -e GPSD_ENABLED="{{ gpsd_enabled }}" \
           -d \
           --restart=always \
           {{ docker_image }}
