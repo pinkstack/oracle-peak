@@ -1,20 +1,16 @@
 package com.pinkstack.oraclepeak.agent
 
-import java.time.{LocalDateTime, ZoneOffset}
-
+import akka.NotUsed
 import akka.actor.ActorSystem
+import akka.stream.alpakka.mqtt.MqttQoS
 import akka.stream.alpakka.mqtt.scaladsl.MqttSink
-import akka.stream.alpakka.mqtt.{MqttMessage, MqttQoS}
 import akka.stream.scaladsl._
 import akka.stream.{Attributes, ClosedShape, RestartSettings}
-import akka.{Done, NotUsed}
 import com.pinkstack.oraclepeak.agent.gpsd.GPSD
-import io.circe.Json
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Model._
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object Agent extends App with LazyLogging {
@@ -46,44 +42,25 @@ object Agent extends App with LazyLogging {
        |GPSD Enabled: ${config.gpsd.enabled}
        |""".stripMargin)
 
-  lazy val mqttSink: Sink[MqttMessage, Future[Done]] = {
+  lazy val mqttSink: Sink[MMessage, _] = {
     logger.info(s"MQTT Sink with broker ${config.mqtt.broker} with root $root")
-    MqttSink(MqttSettings().withConnectionTimeout(5.seconds), MqttQoS.AtMostOnce)
+    Flow[MMessage]
+      .map(_.asMqttMessage)
+      .to(MqttSink(MqttSettings().withConnectionTimeout(5.seconds), MqttQoS.AtMostOnce))
   }
+
+  val restartableEnd = Flow[MMessage]
+    .to(RestartSink.withBackoff(RestartSettings(6.seconds, 20.seconds, 0.2))(() =>
+      Option.when(config.mqtt.emit)(mqttSink)
+        .getOrElse(Sink.foreach[MMessage](m => println(m)))))
 
   RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
 
-    val endSink: Sink[MqttMessage, Future[Done]] =
-      Option.when(config.mqtt.emit)(mqttSink)
-        .getOrElse(Sink.foreach[MqttMessage](m => println(m.payload.utf8String)))
-
-    val restartableEnd = Flow[MMessage]
-      .map(_.asMqttMessage)
-      .to(RestartSink.withBackoff(RestartSettings(6.seconds, 20.seconds, 0.2))(() => endSink))
-
     val gpsdSource: Source[MMessage, NotUsed] = {
       val (host: String, port: Int) = (config.gpsd.url.getHost, config.gpsd.url.getPort)
-      val transform = Flow[Json].map { json =>
-        Source(List[MMessage](
-          MMessage("tpv")(json.noSpacesSortKeys),
-          MMessage("location") {
-            (for {
-              lat <- json.hcursor.get[Double]("lat").toOption
-              lon <- json.hcursor.get[Double]("lon").toOption
-            } yield Json.fromFields(Seq(
-              ("client_id", Json.fromString(config.clientId)),
-              ("location", Json.fromString(config.location)),
-              ("collected_at", Json.fromString(LocalDateTime.now.atOffset(ZoneOffset.UTC).toString)),
-              ("location", Json.fromFields(Seq(
-                ("lat", Json.fromDoubleOrNull(lat)),
-                ("lon", Json.fromDoubleOrNull(lon)),
-              )))))).getOrElse(Json.Null).noSpacesSortKeys
-          }
-        ))
-      }.flatMapConcat(identity)
-
-      Option.when(config.gpsd.enabled)(GPSD.source(host, port).via(transform)).getOrElse(Source.never)
+      Option.when(config.gpsd.enabled)(GPSD.source(host, port)
+        .via(GPSDToMessage.apply)).getOrElse(Source.never)
     }
 
     val sessions: Source[MMessage, _] = Option.when(config.bettercap.enabled) {

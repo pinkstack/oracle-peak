@@ -24,7 +24,7 @@ object SessionToMessage {
         List[MMessage](
           MMessage("agent-version")(BuildInfo.version),
           MMessage("last-update")(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString),
-          MMessage("session")(content = session.asJson.toString),
+          MMessage("session")(content = session.asJson.noSpacesSortKeys),
           MMessage("wifi-aps-size")(session.wifi.aps.size.toString),
           MMessage("wifi-aps-client-size")(session.wifi.aps.map(ap => ap.clients.size).sum.toString)
         ) ++ {
