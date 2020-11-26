@@ -72,11 +72,21 @@ object Agent extends App with LazyLogging {
           .via(bettercap.ToMessage.fromJson)
       }.getOrElse(Source.never[MMessage])
 
-    val merge = builder.add(Merge[MMessage](2))
+    val events = Option.when(config.bettercap.enabled && config.bettercap.eventsEnabled) {
+      Source.tick(1.seconds, 1.seconds, Tick)
+        .via(RestartFlow.withBackoff(RestartSettings(10.seconds, 2.minutes, 0.4))(() =>
+          bettercap.Flows.events()
+        ).map { event =>
+          MMessage("events")(event.noSpacesSortKeys)
+        })
+    }.getOrElse(Source.never[MMessage])
+
+    val merge = builder.add(Merge[MMessage](3))
     val out = builder.add(restartableEnd).in
 
     sessions ~> merge.in(0)
-    gpsdSource ~> merge.in(1)
+    events ~> merge.in(1)
+    gpsdSource ~> merge.in(2)
     merge ~> out
 
     ClosedShape
