@@ -5,7 +5,7 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.mqtt.MqttQoS
 import akka.stream.alpakka.mqtt.scaladsl.MqttSink
 import akka.stream.scaladsl._
-import akka.stream.{Attributes, ClosedShape, RestartSettings}
+import akka.stream.{ClosedShape, RestartSettings}
 import com.pinkstack.oraclepeak.agent.gpsd.GPSD
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Model._
@@ -21,10 +21,10 @@ object Agent extends App with LazyLogging {
   implicit val config: Configuration.Config = Configuration.load
   implicit val root: MMessage.Path = config.mqtt.root / config.location / config.clientId
 
-  val loggingAttributes = Attributes.logLevels(
-    // onElement = Attributes.LogLevels.Info,
-    onFinish = Attributes.LogLevels.Debug,
-    onFailure = Attributes.LogLevels.Debug)
+  // val loggingAttributes = Attributes.logLevels(
+  //   onElement = Attributes.LogLevels.Info,
+  //   onFinish = Attributes.LogLevels.Debug,
+  //   onFailure = Attributes.LogLevels.Debug)
 
   println(
     s"""🏔 🏔 Oracle Peak Agent 🏔 🏔
@@ -60,16 +60,17 @@ object Agent extends App with LazyLogging {
     val gpsdSource: Source[MMessage, NotUsed] = {
       val (host: String, port: Int) = (config.gpsd.url.getHost, config.gpsd.url.getPort)
       Option.when(config.gpsd.enabled)(GPSD.source(host, port)
-        .via(GPSDToMessage.apply)).getOrElse(Source.never)
+        .via(gpsd.ToMessage.apply)).getOrElse(Source.never)
     }
 
-    val sessions: Source[MMessage, _] = Option.when(config.bettercap.enabled) {
-      Source.tick(2.seconds, 2.second, Tick)
-        .via(RestartFlow.withBackoff(RestartSettings(10.seconds, 2.minutes, 0.4))(() =>
-          bettercap.Flows.sessions())
-        )
-        .via(SessionToMessage.apply)
-    }.getOrElse(Source.never[MMessage])
+    val sessions: Source[MMessage, _] =
+      Option.when(config.bettercap.enabled) {
+        Source.tick(2.seconds, 2.second, Tick)
+          .via(RestartFlow.withBackoff(RestartSettings(10.seconds, 2.minutes, 0.4))(() =>
+            bettercap.Flows.rawSessions())
+          )
+          .via(bettercap.ToMessage.fromJson)
+      }.getOrElse(Source.never[MMessage])
 
     val merge = builder.add(Merge[MMessage](2))
     val out = builder.add(restartableEnd).in

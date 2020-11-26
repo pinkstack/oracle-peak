@@ -1,6 +1,6 @@
 package com.pinkstack.oraclepeak.agent
 
-import akka.stream.alpakka.mqtt.{MqttMessage, MqttQoS}
+import akka.stream.alpakka.mqtt.MqttMessage
 import akka.util.ByteString
 
 case class MMessage(topic: String, payload: ByteString) {

@@ -3,10 +3,9 @@ package com.pinkstack.oraclepeak.agent.bettercap
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import com.pinkstack.oraclepeak.core.Model._
-import com.pinkstack.oraclepeak.core.Model.Events._
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Configuration.Config
+import com.pinkstack.oraclepeak.core.Model.Events._
 import com.typesafe.scalalogging.LazyLogging
 
 object Flows extends LazyLogging {
@@ -15,23 +14,22 @@ object Flows extends LazyLogging {
   import io.circe._
   import io.circe.generic.auto._
 
-  def sessions()(implicit system: ActorSystem, configuration: Config): Flow[Tick, Session, NotUsed] = {
-    import system.dispatcher
-
-    logger.info(s"Bettercap URL: ${configuration.bettercap.url}")
-
-    Flow[Tick].mapAsyncUnordered(parallelism = 2)(_ =>
-      WebClient.session.map(_.as[Session].toOption)
-    ).collect {
-      case Some(value: Session) => value
-      case None =>
-        println("FAIL")
-        throw new Exception("Failed parsing session")
-    }.named("session")
+  def rawSessions()(implicit system: ActorSystem, configuration: Config): Flow[Tick, Json, NotUsed] = {
+    logger.info(s"Bettercap collection started on ${configuration.bettercap.url}")
+    Flow[Tick].mapAsyncUnordered(parallelism = 2)(_ => WebClient.session)
+      .named("rawSession")
   }
 
+  def sessions()(implicit system: ActorSystem, configuration: Config): Flow[Tick, Session, NotUsed] =
+    rawSessions
+      .map(_.as[Session].toOption)
+      .collect {
+        case Some(value: Session) => value
+        case None => throw new Exception("Failed parsing session")
+      }.named("session")
+
   def accessPoints()(implicit system: ActorSystem, configuration: Configuration.Config): Flow[Tick, AccessPoint, NotUsed] =
-    sessions()
+    sessions
       .map(_.wifi.aps)
       .map(aps => Source(aps))
       .flatMapConcat(identity)
