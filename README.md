@@ -37,6 +37,7 @@ docker run -d --name=agent \
     -e MQTT_CLIENT_ID=device-one \
     -e MQTT_ROOT_TOPIC=oracle-peak-staging/location-one \
     -e BETTERCAP_URL=http://127.0.0.1:8081 \
+    -e GPSD_URL=gpsd://127.0.0.1:2947 \
     --network=host \
     --restart=always \
     ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest
@@ -70,6 +71,7 @@ Backoff strategy for MQTT broker service
 - `BETTERCAP_URL=http://192.168.33.33:3333`
 - `BETTERCAP_USER=user`
 - `BETTERCAP_PASSWORD=pass`
+- `GPSD_URL=gpsd://127.0.0.1:2947`
 
 #### Images
 
