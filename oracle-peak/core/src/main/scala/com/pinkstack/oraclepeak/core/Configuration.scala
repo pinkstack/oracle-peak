@@ -12,13 +12,17 @@ object Configuration {
     def enabled: Boolean
   }
 
-  final case class Bettercap(url: java.net.URL, user: String, password: String, enabled: Boolean) extends Switchable
+  final case class Bettercap(url: java.net.URL,
+                             user: String,
+                             password: String,
+                             enabled: Boolean = true,
+                             eventsEnabled: Boolean = true) extends Switchable
 
-  final case class Gpsd(url: java.net.URI, enabled: Boolean) extends Switchable
+  final case class Gpsd(url: java.net.URI, enabled: Boolean = true) extends Switchable
 
   final case class Neo4j(url: java.net.URI, user: String, password: String)
 
-  final case class Mqtt(broker: String, clientId: ClientID, root: String, emit: Boolean)
+  final case class Mqtt(broker: String, clientId: ClientID, root: String, emit: Boolean = true)
 
   final case class Config(clientId: ClientID,
                           location: Location,

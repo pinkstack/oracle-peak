@@ -4,7 +4,7 @@ import akka.stream.alpakka.mqtt.MqttMessage
 import akka.util.ByteString
 
 case class MMessage(topic: String, payload: ByteString) {
-  def asMqttMessage: MqttMessage = MqttMessage(topic = topic, payload = payload)
+  def asMqttMessage: MqttMessage = MqttMessage(topic, payload)
 
   override def toString: String = s"$topic: ${payload.decodeString("UTF-8")}"
 }
