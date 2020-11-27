@@ -13,7 +13,7 @@ all:
 
                   # Agent specific
                   client_id: oracle-man
-                  location: location-one
+                  location: geekatrons
                   mqtt_root_topic: oracle-peak-staging
                   gpsd_enabled: 'true'
                   gpsd_url: gpsd://0.0.0.0:2947
@@ -33,7 +33,7 @@ all:
         nucs:
           hosts:
             nuc:
-              ansible_host: nuc-home
+              ansible_host: nuc-ngrok # nuc-home
               become: yes
 
               # Agent specific

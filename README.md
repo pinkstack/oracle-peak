@@ -30,7 +30,7 @@ service with the access to Bettercap (REST API).
 2. Install Docker by following [this instructions (for RPi v3)](https://phoenixnap.com/kb/docker-on-raspberry-pi).
 3. Run the following command on RPi (v3) that will boot the agent. 
 The agent will then read data from Bettercap's REST API endpoints transform it 
-and feed to MQTT topic of your chose. 
+and feed to MQTT topics. 
 
 ```bash
 docker run -d --name=agent \ 
@@ -42,6 +42,74 @@ docker run -d --name=agent \
     --restart=always \
     ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest
 ```
+
+#### MQTT Topics
+
+##### `oracle-peak-staging/+/+/events`
+
+Real-time feed of Bettercap events enriched with additional fields like `agent_version`, 
+`location`, `client_id`, `collected_at` and `key`. Example payload might be something like:
+
+```json
+{
+  "agent_version": "0.1.0",
+  "client_id": "blackbox",
+  "collected_at": "2020-11-27T09:08:01.758994Z",
+  "data": {
+    "alias": "",
+    "essid": "Upstairs",
+    "mac": "AA:AA:AA:AA:AA:AA",
+    "rssi": -82,
+    "vendor": "Liteon Technology Corporation"
+  },
+  "key": "f3c607d69ad06766b30a69a4c919f019f7fbecf772447b0537c3fb2605812d42",
+  "location": "location-one",
+  "tag": "wifi.client.probe",
+  "time": "2020-11-27T17:37:12.048623715Z"
+}
+```
+
+##### `oracle-peak-staging/+/+/session`
+
+WiFi Access Points section of current Bettercap session. 
+Additional fields are also present - `agent_version`, `location`, `client_id`, `collected_at`.
+
+##### `oracle-peak-staging/+/+/location`
+
+Oracle Peak Agent is also able to consume and emit GPS coordinates via GPSD daemon; 
+and if configured publish them to MQTT topics. The payload looks like this:
+
+```json
+{
+  "agent_version": "0.1.0",
+  "client_id": "nuc",
+  "collected_at": "2020-11-27T17:41:40.114371Z",
+  "location": {
+    "lat": 46.0000000,
+    "lon": 14.0000000
+  }
+}
+```
+
+##### `oracle-peak-staging/+/+/last-update`
+
+This topic can be used for emitting the timestamp on when the session is captured.
+It also provides a helpful healthcheck.
+
+##### `oracle-peak-staging/+/+/agent-version`
+
+When doing updates this MQTT topic can be used for monitoring the version of clients that are deployed.
+It is very handy and useful for debugging.
+
+#### Drilling-down
+
+For going deeper into specific location or device; the following topic patterns can be used:
+
+- `oracle-peak-staging/some-location/+/agent-version`
+- `oracle-peak-staging/some-location/some-device/agent-version`
+
+
+#### Systemd on Agents
 
 > 💡 You can find systemd service definition examples for Bettercap [here](utils/bettercap.service) or [here](utils/bettercap-nuc.service). 
 > It might be wise to start Bettercap at system's boot sequence. Meaning if device used for monitoring
