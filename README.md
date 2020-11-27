@@ -28,7 +28,8 @@ service with the access to Bettercap (REST API).
 
 1. Install Bettercap by following [this instructions](https://www.bettercap.org/installation/).
 2. Install Docker by following [this instructions (for RPi v3)](https://phoenixnap.com/kb/docker-on-raspberry-pi).
-3. Run the following command on RPi (v3) that will boot the agent. 
+3. Install the GPSD deamon with [this instructions](https://gpsd.gitlab.io/gpsd/installation.html). This step is optional.
+4. Run the following command on RPi (v3) that will boot the agent. 
 The agent will then read data from Bettercap's REST API endpoints transform it 
 and feed to MQTT topics. 
 
