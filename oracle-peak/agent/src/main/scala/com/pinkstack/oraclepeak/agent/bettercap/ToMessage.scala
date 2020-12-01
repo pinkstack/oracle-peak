@@ -21,15 +21,11 @@ object ToMessage {
       (removeMeta andThen removeClientMeta) (json)
     }
 
-    Json.fromFields(Seq(
-      ("agent_version", Json.fromString(BuildInfo.version)),
-      ("location", Json.fromString(config.location)),
-      ("client_id", Json.fromString(config.clientId)),
-      ("collected_at", Json.fromString(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString)),
-      ("aps",
-        json.hcursor.downField("wifi").downField("aps")
+    MMessage.richMeta.deepMerge(
+      Json.fromFields(Seq(
+        ("aps", json.hcursor.downField("wifi").downField("aps")
           .focus.map(transformAccessPoint).getOrElse(Json.fromValues(Array.empty[Json])))
-    ))
+      )))
   }
 
   def fromJson(implicit root: Path, config: Configuration.Config): Flow[Json, MMessage, NotUsed] =

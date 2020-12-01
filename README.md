@@ -11,9 +11,11 @@ needed to visualise and understand the activity and behaviour of Wi-Fi users and
 The core objectives of the projects are
 
 1. Build or use tools for **information extraction** from WiFi Access Points (APs) and Wi-Fi Clients.
-With specific focus on key data points like `BSSID`s, `ESSID`s, `MAC`'s, Authentication algorithms, 
-manufacturer information and time related activity.
-2. Build **real-time** and low latency resilient pipelining for processing.
+
+    With specific focus on key data points like `BSSID`s, `ESSID`s, `MAC`'s, Authentication algorithms, 
+    manufacturer information and time related activity.
+    
+2. Build a **real-time** and low latency resilient pipelining for processing.
 3. Clean, transform and **visualize** the data in respectful and anonymized way.
 
 ## Collection
@@ -74,6 +76,58 @@ Real-time feed of Bettercap events enriched with additional fields like `agent_v
 WiFi Access Points section of current Bettercap session. 
 Additional fields are also present - `agent_version`, `location`, `client_id`, `collected_at`.
 
+##### `oracle-peak-staging/+/+/access-points`
+
+Similar to MTT topic `oracle-peak-staging/+/+/session`, this one contains WiFi Access Point information, 
+collected in as part of session, however this topic has sessions split per individual APs. 
+
+This topic might be useful if there is demand for purely access point data.
+
+Some additional fields like `agent_version`, `location`, `client_id`, `collected_at` are also added.
+
+```json
+{
+  "agent_version": "0.0.17",
+  "alias": "",
+  "authentication": "PSK",
+  "channel": 8,
+  "cipher": "CCMP",
+  "client_id": "development-box",
+  "clients": [],
+  "collected_at": "2020-12-02T00:24:14.441663Z",
+  "encryption": "WPA2",
+  "first_seen": "2020-12-02T00:16:57.9268976+01:00",
+  "frequency": 2447,
+  "handshake": false,
+  "hostname": "UpstairsX",
+  "ipv4": "0.0.0.0",
+  "ipv6": "",
+  "last_seen": "2020-12-02T00:19:26.374822916+01:00",
+  "location": "development-location",
+  "mac": "e8:de:27:b3:53:64",
+  "received": 0,
+  "rssi": -82,
+  "sent": 0,
+  "vendor": "Tp-Link Technologies Co.,Ltd.",
+  "wps": {
+    "AP Setup Locked": "01",
+    "Config Methods": "Ethernet, Push Button, Label",
+    "Device Name": "Wireless Router TL-WR841N",
+    "Manufacturer": "TP-LINK",
+    "Model Name": "TL-WR841N",
+    "Model Number": "9.0",
+    "Primary Device Type": "AP (oui:0000f204)",
+    "RF Bands": "2.4Ghz",
+    "Response Type": "AP",
+    "Serial Number": "1.0",
+    "State": "Configured",
+    "UUID-E": "1111",
+    "Vendor Extension": "1111",
+    "Version": "1.0"
+  }
+}
+```
+
 ##### `oracle-peak-staging/+/+/location`
 
 Oracle Peak Agent is also able to consume and emit GPS coordinates via GPSD daemon; 
@@ -108,12 +162,12 @@ For going deeper into specific location or device; the following topic patterns 
 - `oracle-peak-staging/some-location/+/agent-version`
 - `oracle-peak-staging/some-location/some-device/agent-version`
 
-
 #### Systemd on Agents
 
-> 💡 You can find systemd service definition examples for Bettercap [here](utils/bettercap.service) or [here](utils/bettercap-nuc.service). 
-> It might be wise to start Bettercap at system's boot sequence. Meaning if device used for monitoring
-> goes down oracle-peak-agent and Bettercap will be also restarted and put back into collection and emitting state.
+> 💡 You can find systemd service definition examples for Bettercap [here](utils/bettercap.service) 
+> or [here](utils/bettercap-nuc.service). It might be wise to start Bettercap at system's boot sequence. 
+> Meaning if device used for monitoring goes down oracle-peak-agent and Bettercap will be also
+> restarted and put back into collection and emitting state.
 
 ##### Resilience
 
@@ -132,14 +186,19 @@ Backoff strategy for MQTT broker service
 
 #### Environment variables
 
+- `CLIENT_ID=oracle-peak-development-box`
+- `LOCATION=development-location`
 - `MQTT_BROKER=tcp://mqtt.eclipse.org`
-- `MQTT_CLIENT_ID=oracle-peak-development-client-XXX`
-- `MQTT_ROOT_TOPIC=oracle-peak-development/experiment-2`
+- `MQTT_ROOT_TOPIC=oracle-peak-development`
 - `MQTT_EMIT=true`
 - `BETTERCAP_URL=http://192.168.33.33:3333`
 - `BETTERCAP_USER=user`
 - `BETTERCAP_PASSWORD=pass`
+- `BETTERCAP_ENABLED=true`
+- `BETTERCAP_EVENTS_ENABLED=true`
 - `GPSD_URL=gpsd://127.0.0.1:2947`
+- `GPSD_ENABLED=true`
+- `AKKA_LOG_LEVEL=WARNING`
 
 #### Images
 

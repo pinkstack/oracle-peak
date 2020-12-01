@@ -16,15 +16,11 @@ object ToMessage {
     for {
       lat <- json.hcursor.get[Double]("lat").toOption
       lon <- json.hcursor.get[Double]("lon").toOption
-    } yield Json.fromFields(Seq(
-      ("agent_version", Json.fromString(BuildInfo.version)),
-      ("location", Json.fromString(config.location)),
-      ("client_id", Json.fromString(config.clientId)),
-      ("collected_at", Json.fromString(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString)),
+    } yield MMessage.richMeta.deepMerge(Json.fromFields(Seq(
       ("location", Json.fromFields(Seq(
         ("lat", Json.fromDoubleOrNull(lat)),
         ("lon", Json.fromDoubleOrNull(lon)),
-      )))))
+      ))))))
   }.getOrElse(Json.Null)
 
 

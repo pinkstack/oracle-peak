@@ -6,7 +6,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import com.pinkstack.oraclepeak.agent.BuildInfo
+import com.pinkstack.oraclepeak.agent.{BuildInfo, MMessage}
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Configuration.Config
 import com.typesafe.scalalogging.LazyLogging
@@ -74,17 +74,8 @@ object Flows extends LazyLogging {
   }
 
   def events()(implicit system: ActorSystem, config: Configuration.Config): Flow[Tick, Json, NotUsed] = {
-    val metaInformation: Json = {
-      Json.fromFields(Seq(
-        ("agent_version", Json.fromString(BuildInfo.version)),
-        ("location", Json.fromString(config.location)),
-        ("client_id", Json.fromString(config.clientId)),
-        ("collected_at", Json.fromString(LocalDateTime.now().atOffset(ZoneOffset.UTC).toString))
-      ))
-    }
-
     rawEvents
-      .map { case (k, v) => (k, metaInformation.deepMerge(v)) }
+      .map { case (k, v) => (k, MMessage.richMeta.deepMerge(v)) }
       .statefulMapConcat { () =>
         var seen = mutable.Queue.empty[EventKey]
         val maxSize = 50

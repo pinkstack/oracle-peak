@@ -5,11 +5,12 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.mqtt.MqttQoS
 import akka.stream.alpakka.mqtt.scaladsl.MqttSink
 import akka.stream.scaladsl._
-import akka.stream.{ClosedShape, RestartSettings}
+import akka.stream.{ClosedShape, RestartSettings, ThrottleMode}
 import com.pinkstack.oraclepeak.agent.gpsd.GPSD
 import com.pinkstack.oraclepeak.core.Configuration
 import com.pinkstack.oraclepeak.core.Model._
 import com.typesafe.scalalogging.LazyLogging
+import io.circe.Json
 
 import scala.concurrent.duration._
 
@@ -81,13 +82,26 @@ object Agent extends App with LazyLogging {
         })
     }.getOrElse(Source.never[MMessage])
 
-    val merge = builder.add(Merge[MMessage](3))
-    val out = builder.add(restartableEnd).in
+    val split: Flow[MMessage, MMessage, NotUsed] = Flow[MMessage]
+      .filter(_.topic.endsWith("session")).map { message =>
+      (for {
+        session <- io.circe.parser.parse(message.payload.utf8String).toOption
+        aps <- session.hcursor.get[Seq[io.circe.Json]]("aps").toOption
+      } yield aps).getOrElse(Seq.empty[io.circe.Json])
+    }.map(Source(_))
+      .flatMapConcat(identity)
+      .map { ap => MMessage("access-points")(MMessage.richMeta.deepMerge(ap).noSpacesSortKeys) }
+      .throttle(100, 200.millisecond, 60, ThrottleMode.Shaping)
 
-    sessions ~> merge.in(0)
-    events ~> merge.in(1)
-    gpsdSource ~> merge.in(2)
-    merge ~> out
+    val merge = builder.add(Merge[MMessage](4))
+    val out = builder.add(restartableEnd).in
+    val broadcast = builder.add(Broadcast[MMessage](2))
+
+    sessions  ~> broadcast  ~> merge.in(0)
+    broadcast ~> split      ~> merge.in(1)
+    events                  ~> merge.in(2)
+    gpsdSource              ~> merge.in(3)
+                               merge ~> out
 
     ClosedShape
   }).run()
