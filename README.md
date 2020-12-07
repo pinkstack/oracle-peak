@@ -15,7 +15,7 @@ The core objectives of the projects are
     With specific focus on key data points like `BSSID`s, `ESSID`s, `MAC`'s, Authentication algorithms, 
     manufacturer information and time related activity.
     
-2. Build a **real-time** and low latency resilient pipelining for processing.
+2. Build a **real-time** and low latency resilient data pipelining.
 3. Clean, transform and [**visualize**](https://github.com/pinkstack/oracle-peak-ui) the data in respectful and anonymized way.
 
 ## Collection
