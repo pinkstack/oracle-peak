@@ -4,3 +4,6 @@ project/target
 data/
 data-krk/
 venv/
+kafka/
+.envrc
+private/

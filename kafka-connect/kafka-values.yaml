@@ -1,0 +1,86 @@
+disabled-service: &disabled-service
+  enabled: false
+
+cp-zookeeper:
+  <<: *disabled-service
+
+cp-kafka:
+  <<: *disabled-service
+
+cp-schema-registry:
+  <<: *disabled-service
+
+cp-kafka-rest:
+  <<: *disabled-service
+
+cp-control-center:
+  <<: *disabled-service
+
+cp-ksql-server:
+  enabled: true
+
+  configurationOverrides:
+    "ksql.internal.topic.replicas": 3
+    "ksql.streams.replication.factor": 3
+    "ksql.logging.processing.topic.replication.factor": 3
+    "ksql.streams.producer.retries": "2147483647"
+    "ksql.sink.replicas": "3"
+    "listeners": "http://0.0.0.0:8088"
+    "security.protocol": "SASL_SSL"
+    "sasl.mechanism": "PLAIN"
+    "request.timeout.ms": "20000"
+    "retry.backoff.ms": "500"
+
+  customEnv:
+    KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+    KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+    KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 3
+    KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 3
+    KSQL_KSQL_SCHEMA_REGISTRY_URL: "https://${CCLOUD_SCHEMA_REGISTRY}"
+    KSQL_KSQL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE: "USER_INFO"
+    KSQL_KSQL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO: "${CCLOUD_SCHEMA_KEY}:${CCLOUD_SCHEMA_SECRET}"
+
+cp-kafka-connect:
+  enabled: true
+  image: pinkstack/kafka-connect
+  imageTag: 0.0.2
+
+  #kafka:
+  #  bootstrapServers: SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
+  customEnv: { }
+
+  configurationOverrides:
+    # "bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
+    # "producer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
+    # "consumer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
+    # "reporter.admin.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
+    # "reporter.producer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
+    # "sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    # "producer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    # "consumer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    # "reporter.admin.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    # "reporter.producer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    "key.converter": org.apache.kafka.connect.storage.StringConverter
+    # "value.converter": org.apache.kafka.connect.json.JsonConverter
+    # "value.converter.schemas.enable": false
+    "ssl.endpoint.identification.algorithm": https
+    "security.protocol": SASL_SSL
+    "sasl.mechanism": PLAIN
+    "request.timeout.ms": 20000
+    "retry.backoff.ms": 500
+    "producer.ssl.endpoint.identification.algorithm": https
+    "producer.security.protocol": SASL_SSL
+    "producer.sasl.mechanism": PLAIN
+    "producer.request.timeout.ms": 20000
+    "producer.retry.backoff.ms": 500
+    "consumer.ssl.endpoint.identification.algorithm": https
+    "consumer.security.protocol": SASL_SSL
+    "consumer.sasl.mechanism": PLAIN
+    "consumer.request.timeout.ms": 20000
+    "consumer.retry.backoff.ms": 500
+    "offset.flush.interval.ms": 10000
+    "offset.storage.file.filename": /tmp/connect.offsets
+    "reporter.admin.security.protocol": SASL_SSL
+    "reporter.admin.sasl.mechanism": PLAIN
+    "reporter.producer.security.protocol": SASL_SSL
+    "reporter.producer.sasl.mechanism": PLAIN

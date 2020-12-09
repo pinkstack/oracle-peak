@@ -97,11 +97,13 @@ object Agent extends App with LazyLogging {
     val out = builder.add(restartableEnd).in
     val broadcast = builder.add(Broadcast[MMessage](2))
 
-    sessions  ~> broadcast  ~> merge.in(0)
-    broadcast ~> split      ~> merge.in(1)
-    events                  ~> merge.in(2)
-    gpsdSource              ~> merge.in(3)
-                               merge ~> out
+    // @formatter:off
+    sessions  ~> broadcast                ~> merge
+                 broadcast  ~> split      ~> merge
+    events                                ~> merge
+    gpsdSource                            ~> merge
+                                             merge ~> out
+    // @formatter:on
 
     ClosedShape
   }).run()
