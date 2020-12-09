@@ -15,8 +15,8 @@ The core objectives of the projects are
     With specific focus on key data points like `BSSID`s, `ESSID`s, `MAC`'s, Authentication algorithms, 
     manufacturer information and time related activity.
     
-2. Build a **real-time** and low latency resilient pipelining for processing.
-3. Clean, transform and **visualize** the data in respectful and anonymized way.
+2. Build a **real-time** and low latency resilient data pipelining.
+3. Clean, transform and [**visualize**](https://github.com/pinkstack/oracle-peak-ui) the data in respectful and anonymized way.
 
 ## Collection
 
@@ -227,6 +227,9 @@ The current setup (although not yet finalised) for collection part of this proje
 - [Alfa Network AWUS036NH USB 2.0 Highpower WLAN Adapter and 5dBi antenna](https://wlan-profi-shop.de/Alfa-Network-AWUS036NH/GE-RT3070-USB-20-Highpower-WLAN-Adapter-2000mW-2W-and-5dBi-antenna)
 - [Lumsing 60W 6 Ports Desktop USB Charger](https://www.amazon.co.uk/Lumsing-Desktop-Charger-Intelligent-Motorola-blue/dp/B01N2LCNED)
 
+### Visualisation layer - *Oracle Peak UI*
+
+The real-time feeds and data are visible and browsable through the [oracle-peak-ui](https://github.com/pinkstack/oracle-peak-ui) single-page application (SPA).
 
 ## Development
 
