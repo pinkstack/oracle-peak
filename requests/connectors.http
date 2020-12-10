@@ -1,0 +1,73 @@
+# curl -i -X PUT -H "Accept:application/json"
+#        -H  "Content-Type:application/json" http://localhost:8083/connectors/SINK_INFLUX_01/config
+#        -d '{
+#            "connector.class"               : "io.confluent.influxdb.InfluxDBSinkConnector",
+#            "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+#            "value.converter.schemas.enable": "true",
+#            "key.converter"                 : "org.apache.kafka.connect.storage.StringConverter",
+#            "topics"                        : "testdata-json4",
+#            "influxdb.url"                  : "http://influxdb:8086",
+#            "influxdb.db"                   : "my_db",
+#            "measurement.name.format"       : "${topic}"
+#
+#        }'
+PUT http://localhost:8083/connectors/SINK_INFLUX_01/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
+  "tasks.max" : "1",
+  "value.converter.schemas.enable": "false",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "topics": "wifi_devices",
+  "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
+  "influxdb.db": "wifi_clients",
+  "measurement.name.format": "${topic}",
+  "value.converter": "io.confluent.connect.avro.AvroConverter",
+  "value.converter.schema.registry.url": "https://psrc-mvkrw.europe-west3.gcp.confluent.cloud"
+}
+
+### Schema-less
+PUT http://localhost:8083/connectors/SINK_INFLUX_01/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
+  "tasks.max" : "1",
+  "topics": "testing-influx",
+  "measurement.name.format": "${topic}",
+  "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
+  "influxdb.db": "testing_connectors",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": false,
+  "value.converter.schema.registry.url": "https://psrc-mvkrw.europe-west3.gcp.confluent.cloud",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "key.converter.schemas.enable": false,
+  "errors.tolerance": "all",
+  "errors.log.enable": true,
+  "errors.log.include.messages": true
+}
+
+###
+PUT http://localhost:8083/connectors/wifi_devices-to-influxdb/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
+  "tasks.max" : "2",
+  "topics": "wifi_devices",
+  "measurement.name.format": "clients_presence",
+  "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
+  "influxdb.db": "wifi",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": false,
+  "value.converter.schema.registry.url": "https://psrc-mvkrw.europe-west3.gcp.confluent.cloud",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "key.converter.schemas.enable": false,
+  "errors.tolerance": "all",
+  "errors.log.enable": true,
+  "errors.log.include.messages": true
+}
