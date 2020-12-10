@@ -1,6 +1,15 @@
 disabled-service: &disabled-service
   enabled: false
 
+security-settings: &security-settings
+  "ssl.endpoint.identification.algorithm": https
+  "sasl.mechanism": PLAIN
+  "request.timeout.ms": 20000
+  "retry.backoff.ms": 500
+  "sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+  "security.protocol": SASL_SSL
+  "basic.auth.credentials.source": USER_INFO
+
 cp-zookeeper:
   <<: *disabled-service
 
@@ -19,17 +28,26 @@ cp-control-center:
 cp-ksql-server:
   enabled: true
 
+  kafka:
+    bootstrapServers: SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
+
   configurationOverrides:
+    <<: *security-settings
+
     "ksql.internal.topic.replicas": 3
     "ksql.streams.replication.factor": 3
     "ksql.logging.processing.topic.replication.factor": 3
     "ksql.streams.producer.retries": "2147483647"
     "ksql.sink.replicas": "3"
     "listeners": "http://0.0.0.0:8088"
-    "security.protocol": "SASL_SSL"
-    "sasl.mechanism": "PLAIN"
-    "request.timeout.ms": "20000"
-    "retry.backoff.ms": "500"
+    "sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    "ksql.basic.auth.credentials.source": USER_INFO
+    "ksql.schema.registry.basic.auth.credentials.source": USER_INFO
+    "ksql.schema.registry.basic.auth.user.info": ${CCLOUD_SCHEMA_KEY}:${CCLOUD_SCHEMA_SECRET}
+    "ksql.schema.registry.url": ${CCLOUD_SCHEMA_REGISTRY}
+    "schema.registry.basic.auth.credentials.source": USER_INFO
+    "schema.registry.basic.auth.user.info": ${CCLOUD_SCHEMA_KEY}:${CCLOUD_SCHEMA_SECRET}
+    "schema.registry.url": ${CCLOUD_SCHEMA_REGISTRY}
 
   customEnv:
     KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
@@ -41,46 +59,69 @@ cp-ksql-server:
     KSQL_KSQL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO: "${CCLOUD_SCHEMA_KEY}:${CCLOUD_SCHEMA_SECRET}"
 
 cp-kafka-connect:
+  # Resources
+  # https://github.com/confluentinc/cp-helm-charts/blob/master/charts/cp-kafka-connect/values.yaml
+  # https://github.com/confluentinc/cp-helm-charts/blob/master/charts/cp-kafka-connect/values.yaml
+  # https://github.com/confluentinc/examples/blob/6.0.0-post/ccloud/template_delta_configs/connect-ccloud.delta
+
   enabled: true
   image: pinkstack/kafka-connect
   imageTag: 0.0.2
 
-  #kafka:
-  #  bootstrapServers: SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
+  kafka:
+    bootstrapServers: SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
+
   customEnv: { }
 
+  cp-schema-registry:
+    url: ${CCLOUD_SCHEMA_REGISTRY_NO_PROTOCOL}
+
   configurationOverrides:
-    # "bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
-    # "producer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
-    # "consumer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
-    # "reporter.admin.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
-    # "reporter.producer.bootstrap.servers": ${CCLOUD_API_BOOTSTRAP_SERVERS}
-    # "sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-    # "producer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-    # "consumer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-    # "reporter.admin.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-    # "reporter.producer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
-    "key.converter": org.apache.kafka.connect.storage.StringConverter
-    # "value.converter": org.apache.kafka.connect.json.JsonConverter
-    # "value.converter.schemas.enable": false
-    "ssl.endpoint.identification.algorithm": https
-    "security.protocol": SASL_SSL
-    "sasl.mechanism": PLAIN
-    "request.timeout.ms": 20000
-    "retry.backoff.ms": 500
-    "producer.ssl.endpoint.identification.algorithm": https
-    "producer.security.protocol": SASL_SSL
-    "producer.sasl.mechanism": PLAIN
-    "producer.request.timeout.ms": 20000
-    "producer.retry.backoff.ms": 500
+    <<: *security-settings
+
+    "replication.factor": 3
+    "config.storage.replication.factor": 3
+    "offset.storage.replication.factor": 3
+    "status.storage.replication.factor": 3
+
+    "bootstrap.servers": SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
+
+    # The converters specify the format of data in Kafka and how to translate it into Connect data. Every Connect user will
+    # need to configure these based on the format they want their data in when loaded from or stored into Kafka
+    "key.converter": org.apache.kafka.connect.json.JsonConverter
+    # "value.converter": org.apache.kafka.connect.json.JsonConverter (schema!)
+    # Converter-specific settings can be passed in by prefixing the Converter's setting with the converter you want to apply
+    # it to
+    "key.converter.schemas.enable": false
+    "value.converter.schemas.enable": false
+
+    # The internal converter used for offsets and config data is configurable and must be specified, but most users will
+    # always want to use the built-in default. Offset and config data is never visible outside of Kafka Connect in this format.
+    "internal.key.converter": org.apache.kafka.connect.json.JsonConverter
+    "internal.value.converter": org.apache.kafka.connect.json.JsonConverter
+    "internal.key.converter.schemas.enable": false
+    "internal.value.converter.schemas.enable": false
+
+    # Store offsets on local filesystem
+    "offset.storage.file.filename": /tmp/connect.offsets
+    # Flush much faster than normal, which is useful for testing/debugging
+    "offset.flush.interval.ms": 10000
+
     "consumer.ssl.endpoint.identification.algorithm": https
-    "consumer.security.protocol": SASL_SSL
     "consumer.sasl.mechanism": PLAIN
     "consumer.request.timeout.ms": 20000
     "consumer.retry.backoff.ms": 500
-    "offset.flush.interval.ms": 10000
-    "offset.storage.file.filename": /tmp/connect.offsets
-    "reporter.admin.security.protocol": SASL_SSL
-    "reporter.admin.sasl.mechanism": PLAIN
-    "reporter.producer.security.protocol": SASL_SSL
-    "reporter.producer.sasl.mechanism": PLAIN
+    "consumer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    "consumer.security.protocol": SASL_SSL
+
+    "producer.ssl.endpoint.identification.algorithm": https
+    "producer.sasl.mechanism": PLAIN
+    "producer.request.timeout.ms": 20000
+    "producer.retry.backoff.ms": 500
+    "producer.sasl.jaas.config": org.apache.kafka.common.security.plain.PlainLoginModule required username="${CCLOUD_API_KEY}" password="${CCLOUD_API_SECRET}";
+    "producer.security.protocol": SASL_SSL
+
+    "value.converter": io.confluent.connect.avro.AvroConverter
+    "value.converter.basic.auth.credentials.source": USER_INFO
+    "value.converter.schema.registry.basic.auth.user.info": ${CCLOUD_SCHEMA_KEY}:${CCLOUD_SCHEMA_SECRET}
+    "value.converter.schema.registry.url": ${CCLOUD_SCHEMA_REGISTRY}
