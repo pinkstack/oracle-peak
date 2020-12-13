@@ -9,5 +9,5 @@ echo $CCLOUD_SCHEMA_KEY
 echo $CCLOUD_SCHEMA_REGISTRY
 echo $CCLOUD_SCHEMA_SECRET
 
-envsubst < kafka-connect/kafka-values.yaml | \
+envsubst < helm/kafka-values.yaml | \
   helm upgrade one confluentinc/cp-helm-charts --values -

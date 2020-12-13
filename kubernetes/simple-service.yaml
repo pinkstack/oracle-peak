@@ -24,6 +24,7 @@ spec:
     - protocol: "TCP"
       port: 80
       targetPort: 80
+      nodePort: 31000
   type: LoadBalancer
 
 ---
@@ -64,7 +65,7 @@ spec:
       app: hello
       tier: frontend
       track: stable
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -79,3 +80,34 @@ spec:
             preStop:
               exec:
                 command: [ "/usr/sbin/nginx","-s","quit" ]
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: sandbox-certificate
+spec:
+  domains:
+    - sandbox.pinkstack.com
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: sandbox-ip
+    kubernetes.io/ingress.allow-http: "false"
+    networking.gke.io/managed-certificates: sandbox-certificate
+  labels:
+    app: hello
+    thing: "12"
+spec:
+  rules:
+    - host: sandbox.pinkstack.com
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: frontend
+              servicePort: 80
+

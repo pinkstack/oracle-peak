@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: tick-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: oraclepeak-ip
+    ingress.kubernetes.io/rewrite-target: /
+
+    # kubernetes.io/ingress.allow-http: "true"
+    # kubernetes.io/ingress.class: "nginx"
+    # networking.gke.io/managed-certificates: sandbox-certificate
+  labels:
+    app: tick
+    version: "0.0.9"
+  namespace: tick
+spec:
+  rules:
+    - host: grafana.oracle-peak.pinkstack.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: cookie-grafana
+              servicePort: 3000

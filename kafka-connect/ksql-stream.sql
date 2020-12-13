@@ -91,14 +91,13 @@ STREAM access_points_json (
 
 
 -- development-access-points => wifi_ap_clients
-CREATE
-STREAM wifi_ap_clients WITH (
+CREATE STREAM wifi_ap_clients WITH (
     KAFKA_TOPIC='wifi_ap_clients',
     VALUE_FORMAT='AVRO',
     TIMESTAMP='collected_at_ts'
 ) AS
-SELECT location
-                                                                                        client_id,
+SELECT location                                                                      AS location,
+       client_id                                                                     AS client_id,
        mac                                                                           AS ap_mac,
        alias                                                                         AS ap_alias,
        channel                                                                       AS ap_channel,
@@ -111,11 +110,10 @@ SELECT location
        explode(clients)->hostname                                                 AS hostname,
        explode(clients)->rssi                                                     AS rssi,
        explode(clients)->vendor                                                   AS vendor,
-       explode(clients)->vendor                                                   AS frequency,
+       explode(clients)->frequency                                                AS frequency,  -- bug!
        explode(clients)->sent                                                     AS sent,
        explode(clients)->received                                                 AS received,
        STRINGTOTIMESTAMP(collected_at, 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS''Z''', 'UTC') AS collected_at_ts
-
 FROM access_points_json
 ;
 
@@ -138,7 +136,9 @@ SELECT collected_at_ts as "time",
                'ap_hostname'    :=ap_hostname,
                'mac'            :=mac,
                'hostname'       :=hostname,
-               'vendor'         :=vendor
+               'vendor'         :=vendor,
+               'client_id'      :=client_id,
+               'location'       :=location
            )      AS "tags"
 FROM wifi_ap_clients
 ;
