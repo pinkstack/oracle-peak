@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
   "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
-  "tasks.max" : "1",
+  "tasks.max": "1",
   "value.converter.schemas.enable": "false",
   "key.converter": "org.apache.kafka.connect.storage.StringConverter",
   "topics": "wifi_devices",
@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
   "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
-  "tasks.max" : "1",
+  "tasks.max": "1",
   "topics": "testing-influx",
   "measurement.name.format": "${topic}",
   "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
@@ -57,7 +57,7 @@ Content-Type: application/json
 
 {
   "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
-  "tasks.max" : "2",
+  "tasks.max": "2",
   "topics": "wifi_devices",
   "measurement.name.format": "clients_presence",
   "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
@@ -69,5 +69,37 @@ Content-Type: application/json
   "key.converter.schemas.enable": false,
   "errors.tolerance": "all",
   "errors.log.enable": true,
-  "errors.log.include.messages": true
+  "errors.log.include.messages": true,
+  "kafka.key.deserializer": "org.apache.kafka.common.serialization.ByteArrayDeserializer",
+  "kafka.value.deserializer": "org.apache.kafka.common.serialization.ByteArrayDeserializer"
 }
+
+###
+PUT http://localhost:8083/connectors/access-points-to-neo4j/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+  "name": "access-points-to-neo4j",
+  "neo4j.authentication.basic.password": "KQKhYVYgNR6BZCRr2ktrzdwdQbU2CR",
+  "neo4j.authentication.basic.username": "neo4j",
+  "neo4j.database": "neo4j",
+  "neo4j.server.uri": "bolt://ro-neo4j-core-0.ro-neo4j.neo.svc.cluster.local:7687",
+  "topics": "development-access-points,wifi_devices",
+  "streams.sink.enabled": "true",
+  "neo4j.topic.cypher.development-access-points": "MERGE (ap:AccessPoint {mac: event.mac}) ON CREATE SET ap.created = timestamp(), ap.hostname = event.hostname ON MATCH SET ap.lastSeen = timestamp()",
+  "neo4j.topic.cypher.wifi_devices": "MATCH (ap:AccessPoint {mac: event.tags.ap_mac}) MERGE (ap)<-[r:CONNECTED]-(client:Client {mac: event.tags.mac}) ON CREATE SET client.created = timestamp() ON MATCH SET client.lastSeen = timestamp()",
+  "errors.tolerance": "all",
+  "errors.log.enable": true,
+  "errors.log.include.messages": true,
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter.schemas.enable": "false",
+  "tasks.max": "2",
+  "consumer.override.auto.offset.reset": "earliest"
+}
+
+###
+- https://neo4j.com/labs/kafka/4.0/consumer/
+"streams.sink.topic.cypher.development-access-points": "MERGE (accessPoint: AccessPoint) {mac: event.mac, hostname: event.hostname} ON CREATE SET accessPoint.created = timestamp() ON MATCH SET accessPoint.lastSeen = timestamp() RETURN accessPoint",

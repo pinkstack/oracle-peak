@@ -1,0 +1,14 @@
+# Documentation
+# - https://neo4j.com/labs/neo4j-helm/1.0.0/configreference/#_neo4j_core_members
+# - https://github.com/neo4j-contrib/neo4j-helm
+# - https://github.com/neo4j-contrib/neo4j-helm/blob/master/deployment-scenarios/quickstart-standalone.yaml
+
+core:
+  standalone: true
+  persistentVolume:
+    enabled: true
+
+plugins: "[\"apoc\",\"graph-data-science\"]"
+
+acceptLicenseAgreement: "yes"
+neo4jPassword: "${NEO4J_PASSWORD}"

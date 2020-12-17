@@ -83,6 +83,7 @@ cp-kafka-connect:
     "config.storage.replication.factor": 3
     "offset.storage.replication.factor": 3
     "status.storage.replication.factor": 3
+    "connector.client.config.override.policy": All
 
     "bootstrap.servers": SASL_SSL://${CCLOUD_API_BOOTSTRAP_SERVERS}
 
