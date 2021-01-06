@@ -96,27 +96,29 @@ CREATE STREAM wifi_ap_clients WITH (
     VALUE_FORMAT='AVRO',
     TIMESTAMP='collected_at_ts'
 ) AS
-SELECT location                                                                      AS location,
-       client_id                                                                     AS client_id,
-       mac                                                                           AS ap_mac,
-       alias                                                                         AS ap_alias,
-       channel                                                                       AS ap_channel,
-       vendor                                                                        AS ap_vendor,
-       frequency                                                                     AS ap_frequency,
-       rssi                                                                          AS ap_rssi,
-       hostname                                                                      AS ap_hostname,
-       explode(clients)->mac                                                      AS mac,
-       explode(clients)->alias                                                    AS alias,
-       explode(clients)->hostname                                                 AS hostname,
-       explode(clients)->rssi                                                     AS rssi,
-       explode(clients)->vendor                                                   AS vendor,
-       explode(clients)->frequency                                                AS frequency,  -- bug!
-       explode(clients)->sent                                                     AS sent,
-       explode(clients)->received                                                 AS received,
-       STRINGTOTIMESTAMP(collected_at, 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS''Z''', 'UTC') AS collected_at_ts
+SELECT location                    AS location,
+       client_id                   AS client_id,
+       mac                         AS ap_mac,
+       alias                       AS ap_alias,
+       channel                     AS ap_channel,
+       vendor                      AS ap_vendor,
+       frequency                   AS ap_frequency,
+       rssi                        AS ap_rssi,
+       hostname                    AS ap_hostname,
+       explode(clients)->mac       AS mac,
+       explode(clients)->alias     AS alias,
+       explode(clients)->hostname  AS hostname,
+       explode(clients)->rssi      AS rssi,
+       explode(clients)->vendor    AS vendor,
+       explode(clients)->sent      AS sent,
+       explode(clients)->received  AS received,
+       STRINGTOTIMESTAMP(collected_at, 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS''Z''', 'UTC') AS collected_at_ts,
+       ROWKEY AS ID
 FROM access_points_json
 ;
 
+-- explode(clients)->frequency                                                AS frequency,  -- bug!
+--
 SET 'auto.offset.reset' = 'earliest';
 
 CREATE
@@ -139,6 +141,18 @@ SELECT collected_at_ts as "time",
                'vendor'         :=vendor,
                'client_id'      :=client_id,
                'location'       :=location
-           )      AS "tags"
+           )      AS "tags",
+       ID         AS "ROWKEY"
 FROM wifi_ap_clients
+;
+
+CREATE STREAM pageviews_enriched AS
+SELECT
+    location                    AS location,
+    client_id                   AS client_id,
+    mac                         AS ap_mac,
+    tags->mac                   AS mac,
+    locations.position          AS geo_position
+FROM wifi_ap_clients
+         LEFT JOIN locations ON locations.client_id = wifi_ap_clients.client_id
 ;

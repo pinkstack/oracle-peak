@@ -30,6 +30,20 @@ all:
                   gpsd_url: gpsd://0.0.0.0:2947
               vars:
                 docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
+            v4s:
+              hosts:
+                tinka:
+                  ansible_host: tinka-geekatrons
+                  become: yes
+
+                  # Agent specific
+                  client_id: tinka
+                  location: geekatrons
+                  mqtt_root_topic: oracle-peak-staging
+                  gpsd_enabled: 'false'
+                  gpsd_url: gpsd://0.0.0.0:2947
+              vars:
+                docker_image: "ghcr.io/pinkstack/oracle-peak-agent-arm32v7:latest"
         nucs:
           hosts:
             nuc:
@@ -46,17 +60,4 @@ all:
             docker_image: "ghcr.io/pinkstack/oracle-peak-agent:latest"
       vars:
         bettercap_url: http://127.0.0.1:8081
-    k8:
-      children:
-        masters:
-          hosts:
-            master-1:
-              ansible_host: hetzner-pinkstack-master-1
-        nodes:
-          hosts:
-            node-1:
-              ansible_host: hetzner-pinkstack-node-1
-            node-2:
-              ansible_host: hetzner-pinkstack-node-2
-
 

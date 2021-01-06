@@ -91,9 +91,6 @@ object Neo4jSink extends LazyLogging {
 object CollectApp extends App with LazyLogging {
 
   implicit val system: ActorSystem = ActorSystem("collect")
-
-  import system.dispatcher
-
   implicit val config: Configuration.Config = Configuration.load
 
   scala.sys.addShutdownHook {
@@ -101,30 +98,4 @@ object CollectApp extends App with LazyLogging {
     system.terminate()
     Await.result(system.whenTerminated, 30.seconds)
   }
-
-  /*
-
-    Source.tick(0.seconds, 2.seconds, Tick)
-      .via(BetterCapCollectionFlow.accessPoints())
-      .runWith(Neo4jSink())
-
-
-
-  Source.tick(0.seconds, 2.seconds, Tick)
-    .via(Flows.accessPoints())
-    .runWith(Sink.foreach(println))
-
-  val f = Source.tick(0.seconds, 2.seconds, Tick)
-    .log("log")
-    .addAttributes(Attributes.logLevels(
-      onElement = Attributes.LogLevels.Debug,
-      onFinish = Attributes.LogLevels.Debug,
-      onFailure = Attributes.LogLevels.Error))
-    .via(Flows.events())
-    .runWith(Sink.foreach(println))
-
-  f.onComplete {
-    case Success(value) => println(value)
-    case Failure(exception) => System.err.println(exception)
-  } */
 }

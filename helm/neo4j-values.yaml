@@ -8,6 +8,13 @@ core:
   persistentVolume:
     enabled: true
 
+  numberOfServers: 1
+
+  #service:
+  #  type: NodePort
+  #  port: 7474
+  #  nodePort: 30020
+
 plugins: "[\"apoc\",\"graph-data-science\"]"
 
 acceptLicenseAgreement: "yes"

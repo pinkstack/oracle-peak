@@ -1,0 +1,18 @@
+[Unit]
+Description=Bettercap Monitoring
+Documentation=https://bettercap.org
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+PermissionsStartOnly=true
+ExecStartPre=/sbin/ip link set wlan1 down
+ExecStartPre=/sbin/iw dev wlan1 set type monitor
+ExecStartPre=/sbin/ip link set wlan1 up
+ExecStart=/home/pi/go/src/github.com/bettercap/bettercap/bettercap -no-colors -no-history -eval 'set api.rest.username dodo; set api.rest.password pass; set api.rest.address 0.0.0.0; set http.server.address 0.0.0.0; api.rest on; set wifi.interface wlan1; wifi.recon on'
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

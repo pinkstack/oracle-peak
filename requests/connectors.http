@@ -57,7 +57,7 @@ Content-Type: application/json
 
 {
   "connector.class": "io.confluent.influxdb.InfluxDBSinkConnector",
-  "tasks.max": "2",
+  "tasks.max": "3",
   "topics": "wifi_devices",
   "measurement.name.format": "clients_presence",
   "influxdb.url": "http://snow-influxdb.tick.svc.cluster.local:8086",
@@ -75,7 +75,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:8083/connectors/access-points-to-neo4j/config
+PUT http://localhost:8083/connectors/access-points-to-neo4j/configxx
 Accept: application/json
 Content-Type: application/json
 
@@ -85,7 +85,7 @@ Content-Type: application/json
   "neo4j.authentication.basic.password": "KQKhYVYgNR6BZCRr2ktrzdwdQbU2CR",
   "neo4j.authentication.basic.username": "neo4j",
   "neo4j.database": "neo4j",
-  "neo4j.server.uri": "bolt://ro-neo4j-core-0.ro-neo4j.neo.svc.cluster.local:7687",
+  "neo4j.server.uri": "bolt://ro-neo4j.neo.svc.cluster.local:7687",
   "topics": "development-access-points,wifi_devices",
   "streams.sink.enabled": "true",
   "neo4j.topic.cypher.development-access-points": "MERGE (ap:AccessPoint {mac: event.mac}) ON CREATE SET ap.created = timestamp(), ap.hostname = event.hostname ON MATCH SET ap.lastSeen = timestamp()",
@@ -96,10 +96,94 @@ Content-Type: application/json
   "value.converter": "org.apache.kafka.connect.json.JsonConverter",
   "key.converter": "org.apache.kafka.connect.storage.StringConverter",
   "value.converter.schemas.enable": "false",
-  "tasks.max": "2",
+  "tasks.max": "1",
+  "consumer.override.auto.offset.reset": "earliest"
+}
+
+### V3
+PUT http://localhost:8083/connectors/access-points-to-neo4j/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+  "name": "access-points-to-neo4j",
+  "neo4j.authentication.basic.password": "KQKhYVYgNR6BZCRr2ktrzdwdQbU2CR",
+  "neo4j.authentication.basic.username": "neo4j",
+  "neo4j.database": "neo4j",
+  "neo4j.server.uri": "bolt://ro-neo4j.neo.svc.cluster.local:7687",
+  "topics": "development-access-points,wifi_devices",
+  "streams.sink.enabled": "true",
+  "neo4j.topic.cypher.development-access-points": "MERGE (l:Location {location: event.location}) MERGE (ap:AccessPoint {mac: event.mac}) ON CREATE SET ap.hostname = event.hostname MERGE (ap)<-[:BELONGS_TO]-(l)",
+  "neo4j.topic.cypher.wifi_devices": "MERGE (ap:AccessPoint {mac: event.tags.ap_mac, hostname: event.tags.ap_hostname}) MERGE (client:Client {mac: event.tags.mac}) MERGE (ap)<-[r:CONNECTED]-(client)",
+  "errors.tolerance": "all",
+  "errors.log.enable": true,
+  "errors.log.include.messages": true,
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter.schemas.enable": "false",
+  "tasks.max": "1",
+  "consumer.override.auto.offset.reset": "earliest"
+}
+
+### probes
+PUT http://localhost:8083/connectors/probes-to-neo4j/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+  "name": "probes-to-neo4j",
+  "neo4j.authentication.basic.password": "KQKhYVYgNR6BZCRr2ktrzdwdQbU2CR",
+  "neo4j.authentication.basic.username": "neo4j",
+  "neo4j.database": "neo4j",
+  "neo4j.server.uri": "bolt://ro-neo4j.neo.svc.cluster.local:7687",
+  "topics": "development-wifi-events",
+  "streams.sink.enabled": "true",
+  "neo4j.topic.cypher.development-wifi-events": "MATCH (existingAp:AccessPoint {hostname: event.data.essid}) MERGE (ap:AccessPoint {mac: existingAp.mac, hostname: event.data.essid}) MERGE (client:Client {mac: event.data.mac}) MERGE (ap)<-[r:PROBING]-(client)",
+  "transforms": "filterProbes",
+  "transforms.filterProbes.type": "io.confluent.connect.transforms.Filter$Value",
+  "transforms.filterProbes.filter.condition": "[?(@.tag == 'wifi.client.probe')]",
+  "transforms.filterProbes.filter.type": "include",
+  "transforms.filterProbes.filter.missing.or.null.behavior": "fail",
+  "errors.tolerance": "all",
+  "errors.log.enable": true,
+  "errors.log.include.messages": true,
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter.schemas.enable": "false",
+  "tasks.max": "1",
   "consumer.override.auto.offset.reset": "earliest"
 }
 
 ###
-- https://neo4j.com/labs/kafka/4.0/consumer/
-"streams.sink.topic.cypher.development-access-points": "MERGE (accessPoint: AccessPoint) {mac: event.mac, hostname: event.hostname} ON CREATE SET accessPoint.created = timestamp() ON MATCH SET accessPoint.lastSeen = timestamp() RETURN accessPoint",
+
+// default: latest
+// beginning: earliest
+// ,"consumer.override.auto.offset.reset": "latest"
+// - https://neo4j.com/labs/kafka/4.0/consumer/
+// "streams.sink.topic.cypher.development-access-points": "MERGE (accessPoint: AccessPoint) {mac: event.mac, hostname: event.hostname} ON CREATE SET accessPoint.created = timestamp() ON MATCH SET accessPoint.lastSeen = timestamp() RETURN accessPoint",
+
+###
+PUT http://localhost:8083/connectors/mqtt-to-wifi-access-points/config
+Accept: application/json
+Content-Type: application/json
+
+{
+  "connector.class": "io.confluent.connect.mqtt.MqttSourceConnector",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+  "errors.retry.timeout": "-1",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "mqtt.server.uri": "tcp://broker.emqx.io",
+  "mqtt.topics": "oracle-peak-staging/+/+/access-points",
+  "mqtt.qos": "1",
+  "confluent.topic.bootstrap.servers": "pkc-4ygn6.europe-west3.gcp.confluent.cloud:9092",
+  "kafka.topic": "development-access-points",
+  "confluent.topic.client.dns.lookup": "use_all_dns_ips",
+  "confluent.topic.security.protocol": "SASL_SSL",
+  "confluent.topic.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule   required username='VXHYLWWBGLZORBPP'   password='qAon1vEm7Hw4hRVzzkPRiCG0dfmOMaxO78oGkNPD+8kurN+eF9mh32U6SB3nD8Rn';",
+  "confluent.topic.acks": "all",
+  "confluent.topic.sasl.mechanism": "PLAIN"
+}

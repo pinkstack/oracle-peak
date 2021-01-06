@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: core
+    app.kubernetes.io/instance: ro
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: neo4j
+    neo4j.com/bolt: "true"
+    neo4j.com/http: "true"
+    neo4j.com/https: "true"
+
+    # statefulset.kubernetes.io/pod-name: $DEPLOYMENT-neo4j-core-$IDX
+  name: ro-neo4j
+  namespace: neo
+spec:
+  type: LoadBalancer
+  # clusterIP: "0.0.0.0"
+  # nodePort: 30020
+  loadBalancerIP: 35.234.79.36
+  # externalTrafficPolicy: Local
+  sessionAffinity: None
+  ports:
+    - name: bolt
+      port: 7687
+      protocol: TCP
+      targetPort: 7687
+    - name: http
+      port: 7474
+      protocol: TCP
+      targetPort: 7474
+    - name: https
+      port: 7473
+      protocol: TCP
+      targetPort: 7473
+  selector:
+    # statefulset.kubernetes.io/pod-name: $DEPLOYMENT-neo4j-core-$IDX
+    app.kubernetes.io/component: core
+    app.kubernetes.io/instance: ro
+    app.kubernetes.io/name: neo4j

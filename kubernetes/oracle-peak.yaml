@@ -3,22 +3,15 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: tick-ingress
+  namespace: tick
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: letsencrypt
-
-    # kubernetes.io/ingress.class: "gce"
-    # kubernetes.io/ingress.global-static-ip-name: oraclepeak-ip
-    # ingress.kubernetes.io/rewrite-target: /
-
-    # kubernetes.io/ingress.allow-http: "true"
-    # networking.gke.io/managed-certificates: sandbox-certificate
+    ingress.kubernetes.io/rewrite-target: /
   labels:
     app: tick
-    version: "0.0.9"
-  namespace: tick
+    version: "0.0.12"
 spec:
-
   tls:
     - hosts:
         - tick-ingress.grafana.oracle-peak.pinkstack.com
@@ -31,6 +24,45 @@ spec:
             backend:
               serviceName: cookie-grafana
               servicePort: 3000
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: neo-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: letsencrypt2
+    # ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: ro-neo4j
+    nginx.org/websocket-services: ro-neo4j
+  labels:
+    app: tick
+    version: "0.0.5"
+  namespace: neo
+spec:
+  tls:
+    - hosts:
+        # - neo-ingress.neo4j.oracle-peak.pinkstack.com
+        - neo4j.oracle-peak.pinkstack.com
+      secretName: tls-secret-two
+  rules:
+    - host: neo4j.oracle-peak.pinkstack.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: ro-neo4j
+              servicePort: 7474
+
+          - path: /ws
+            backend:
+              serviceName: ro-neo4j
+              servicePort: 7687
 
 ---
 apiVersion: v1

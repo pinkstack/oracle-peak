@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt2
+  namespace: neo
+  labels:
+    ersion: "0.0.3"
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: otobrglez@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt2
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+            podTemplate:
+              spec:
+                nodeSelector:
+                  "kubernetes.io/os": linux
